@@ -6,10 +6,21 @@ const AuthService = {
   login: async (params: { user: string; password: string }) => {
     const response = await apiRequest("POST", "/api/login", params);
 
-    if (response?.success && response?.data) {
+    if (response?.success && response?.result) {
+      const authData = {
+        id: response.result.id,
+        name: response.result.name,
+        surname: response.result.surname,
+        email: response.result.email,
+        role: response.result.role,
+        photo: response.result.photo,
+        access_token: response.result.access_token,
+        isLoggedIn: true,
+      };
+
       localStorage.setItem(
         LOCAL_STORAGE_AUTH,
-        JSON.stringify(response.data)
+        JSON.stringify(authData)
       );
     }
 
@@ -23,8 +34,8 @@ const AuthService = {
 
   getAuth: () => {
     if (typeof window === "undefined") return null;
-    const data = localStorage.getItem(LOCAL_STORAGE_AUTH);
-    return data ? JSON.parse(data) : null;
+    const raw = localStorage.getItem(LOCAL_STORAGE_AUTH);
+    return raw ? JSON.parse(raw) : null;
   },
 };
 

@@ -14,11 +14,11 @@ const useLogin = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-   useEffect(() => {
-      if (isLoggedIn()) {
-        router.replace("/dashboard");
-      }
-    }, []);
+  useEffect(() => {
+    if (isLoggedIn()) {
+      router.replace("/dashboard");
+    }
+  }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,22 +26,14 @@ const useLogin = () => {
     setLoading(true);
 
     try {
-      const response = await AuthService.login({
-        user,
-        password,
-      });
+      const response = await AuthService.login({ user, password });
 
       if (response?.success) {
-       
-        localStorage.setItem(
-          "token",
-          response.result.access_token
-        );
         router.replace("/dashboard");
         return;
-      } else {
-        setError(response.message || "Invalid credentials");
       }
+
+      setError(response?.message || "Invalid credentials");
     } catch (err: any) {
       setError(err.message || "Login failed");
     } finally {
