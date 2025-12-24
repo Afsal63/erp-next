@@ -4,7 +4,6 @@ import { ChevronRight, ChevronDown, Pencil, Trash2, Eye } from "lucide-react";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import useInventory from "./useInventory";
 import EditModal from "@/components/ui/EditModal";
-import InventoryItemModal from "@/components/inventory/InventoryItemModal";
 
 export default function InventoryPage() {
   const {
