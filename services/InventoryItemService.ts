@@ -19,6 +19,19 @@ const InventoryItemService = {
     );
   },
 
+searchInventoryItem: (
+  barCode: string,
+  page = 1,
+  items = 10,
+  q = ""
+) =>
+  apiRequest(
+    "POST",
+    `/api/inventory/filter?page=${page}&items=${items}&barCode=${barCode}&search=${encodeURIComponent(
+      q
+    )}`
+  ),
+
  readById: (id: string) =>
     apiRequest("GET", `/api/inventory/read/${id}`),
 

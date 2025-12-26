@@ -36,13 +36,22 @@ const apiRequest = async (
       error?.message ||
       "Something went wrong";
 
-    // 🔴 TOKEN / AUTH ERRORS
-    if (status === 401 || status === 403) {
+    // 🔴 AUTH / JWT EXPIRED
+    if (
+      status === 401 ||
+      status === 403 ||
+      message.toLowerCase().includes("jwt")
+    ) {
       toast.error("Session expired. Please login again.");
 
-      // small delay so toast is visible
+      // ✅ CLEAR AUTH STORAGE
+      if (typeof window !== "undefined") {
+        localStorage.removeItem("auth");
+      }
+
+      // ⏳ small delay for toast visibility
       setTimeout(() => {
-        logout();
+        logout(); // redirect to login
       }, 1200);
 
       return {
