@@ -77,6 +77,7 @@ const useEmployees = () => {
       name: "",
       surname: "",
       phone: "",
+      email: "",
       phonePrefix: "+971",
       department: "",
       position: "",
@@ -85,31 +86,40 @@ const useEmployees = () => {
     setModalOpen(true);
   };
 
-const onBarcodeSelect = async (barCode: string) => {
-  try {
-    const res = await InventoryItemService.listByBarcode(barCode, 1, 100, "");
-    if (!res?.success) return;
+  const onBarcodeSelect = async (barCode: string) => {
+    try {
+      const res = await InventoryItemService.listByBarcode(barCode, 1, 100, "");
+      if (!res?.success) return;
 
-    setModalForm((prev: any) => {
-      const existing = prev.items || [];
-      const existingMap = new Map(existing.map((i: any) => [i._id, i]));
+      setModalForm((prev: any) => {
+        const existing = prev.items || [];
+        const existingMap = new Map(existing.map((i: any) => [i._id, i]));
 
-      const newItems = res.result
-        .filter((inv: any) => !existingMap.has(inv._id))
-        .map((inv: any) => ({
-          _id: inv._id,
-          barCode: inv.barCode,
-          itemName: inv.itemName,
-          actualQty: inv.quantity ?? inv.actualQty,
-          quantity: 0,
-        }));
+        const newItems = res.result
+          .filter((inv: any) => !existingMap.has(inv._id))
+          .map((inv: any) => ({
+            _id: inv._id,
+            barCode: inv.barCode,
+            itemName: inv.itemName,
 
-      return { ...prev, items: [...existing, ...newItems] };
-    });
-  } catch {
-    toast.error("Failed to load inventory items");
-  }
-};
+            // ✅ AVAILABLE QTY comes from inventory
+            availableQty: inv.quantity,
+
+            // ✅ actualQty ONLY if backend explicitly sends it
+            ...(typeof inv.actualQty !== "undefined"
+              ? { actualQty: inv.actualQty }
+              : {}),
+
+            // employee assignment
+            quantity: 0,
+          }));
+
+        return { ...prev, items: [...existing, ...newItems] };
+      });
+    } catch {
+      toast.error("Failed to load inventory items");
+    }
+  };
 
   const saveEmployee = async () => {
     try {
@@ -123,13 +133,25 @@ const onBarcodeSelect = async (barCode: string) => {
       const payload = {
         ...modalForm,
 
-        // ✅ INCLUDE itemName along with barCode & quantity
         items: (modalForm.items || [])
-          .filter((i: any) => Number(i.quantity) > 0)
+          .filter(
+            (i: any) =>
+              Number(i.quantity) > 0 ||
+              (typeof i.actualQty !== "undefined" &&
+                i.actualQty !== i._originalActualQty)
+          )
           .map((i: any) => ({
             barCode: i.barCode,
-            itemName: i.itemName, // ✅ NEW (important)
-            quantity: Number(i.quantity),
+            itemName: i.itemName,
+
+            // ✅ Add Qty
+            quantity: Number(i.quantity) || 0,
+
+            // ✅ Send actualQty ONLY if user changed it
+            ...(typeof i.actualQty !== "undefined" &&
+            i.actualQty !== i._originalActualQty
+              ? { actualQty: Number(i.actualQty) }
+              : {}),
           })),
       };
 
