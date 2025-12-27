@@ -1,26 +1,20 @@
 import apiRequest from "@/lib/apiRequest";
-import CustomersService from "@/services/CustomersService";
-import { Customer } from "@/types/customer";
-import { Executive } from "@/types/executive";
+import EmployeeService from "@/services/EmployeeService";
+import { Employee } from "@/types/employee";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const ITEMS_PER_PAGE = 10;
 
-const useCustomers = () => {
+const useEmployees = () => {
   /* ================= STATE ================= */
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
 
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState<any>(null);
 
   const [search, setSearch] = useState("");
-
-  /* ================= EXECUTIVES ================= */
-  const [executives, setExecutives] = useState<Executive[]>([]);
-  const [executiveSearch, setExecutiveSearch] = useState("");
-  const [executiveLoading, setExecutiveLoading] = useState(false);
 
   /* ================= DELETE ================= */
   const [deleteId, setDeleteId] = useState<string | null>(null);
@@ -37,7 +31,7 @@ const useCustomers = () => {
   const [modalLoading, setModalLoading] = useState(false);
 
   /* ================= FETCH ================= */
-  const fetchCustomers = async (
+  const fetchEmployees = async (
     pageNo: number = page,
     searchValue: string = search
   ) => {
@@ -47,28 +41,29 @@ const useCustomers = () => {
       let res;
 
       if (searchValue.trim()) {
-        // 🔍 SEARCH API
-        res = await CustomersService.searchCustomers(
-          pageNo,
-          ITEMS_PER_PAGE,
-          searchValue.trim(),
-          "company"
+        // 🔍 SEARCH EMPLOYEES
+        res = await apiRequest(
+          "GET",
+          `/api/employee/search?q=${searchValue.trim()}&fields=name`
         );
       } else {
-        // 📄 LIST API
-        res = await CustomersService.listCustomers(pageNo, ITEMS_PER_PAGE);
+        // 📄 LIST EMPLOYEES
+        res = await apiRequest(
+          "GET",
+          `/api/employee/list?page=${pageNo}&items=${ITEMS_PER_PAGE}`
+        );
       }
 
       if (res?.success) {
-        setCustomers(res.result || []);
+        setEmployees(res.result || []);
         setPagination(res.pagination || null);
       } else {
-        setCustomers([]);
+        setEmployees([]);
         setPagination(null);
       }
     } catch (err: any) {
-      toast.error(err?.message || "Failed to load customers");
-      setCustomers([]);
+      toast.error(err?.message || "Failed to load employees");
+      setEmployees([]);
       setPagination(null);
     } finally {
       setLoading(false);
@@ -77,7 +72,7 @@ const useCustomers = () => {
 
   /* ================= PAGINATION ================= */
   useEffect(() => {
-    fetchCustomers(page, search);
+    fetchEmployees(page, search);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
@@ -87,54 +82,26 @@ const useCustomers = () => {
 
     setSearch(trimmed);
     setPage(1);
-    fetchCustomers(1, trimmed);
+    fetchEmployees(1, trimmed);
   };
 
-  /* ================= EXECUTIVE SEARCH ================= */
-  useEffect(() => {
-    if (!executiveSearch.trim()) {
-      setExecutives([]);
-      return;
-    }
-
-    const delay = setTimeout(async () => {
-      try {
-        setExecutiveLoading(true);
-
-        const res = await apiRequest(
-          "GET",
-          `/api/employee/search?q=${executiveSearch}&fields=name`
-        );
-
-        if (res?.success) {
-          setExecutives(res.result || []);
-        } else {
-          setExecutives([]);
-        }
-      } catch {
-        setExecutives([]);
-      } finally {
-        setExecutiveLoading(false);
-      }
-    }, 400); // debounce
-
-    return () => clearTimeout(delay);
-  }, [executiveSearch]);
-
   /* ================= MODALS ================= */
-  const openItemModal = async (id: string, mode: "view" | "edit") => {
+  const openItemModal = async (
+    id: string,
+    mode: "view" | "edit" | "delete"
+  ) => {
     try {
-      setModalMode(mode);
+      setModalMode(mode === "delete" ? "view" : mode);
       setModalLoading(true);
 
-      const res = await CustomersService.readById(id);
+      const res = await apiRequest("GET", `/api/employee/read/${id}`);
       if (res?.success) {
         setModalForm(res.result);
         setModalId(id);
         setModalOpen(true);
       }
     } catch {
-      toast.error("Failed to load customer");
+      toast.error("Failed to load employee");
     } finally {
       setModalLoading(false);
     }
@@ -148,61 +115,47 @@ const useCustomers = () => {
   };
 
   /* ================= SAVE (CREATE / EDIT) ================= */
-  const saveCustomer = async () => {
+  const saveEmployee = async () => {
     try {
       setModalLoading(true);
 
-      // ✅ NORMALIZE PAYLOAD FOR BACKEND
       const payload = {
-        company: modalForm.company?.trim(),
+        name: modalForm.name?.trim(),
+        surname: modalForm.surname?.trim(),
         phone: modalForm.phone?.trim(),
-
+        phonePrefix: modalForm.phonePrefix || "+971",
+        email: modalForm.email || "",
+        department: modalForm.department || "",
+        position: modalForm.position || "",
         address: modalForm.address || "",
-        location: modalForm.location || "",
-        registrationType: modalForm.registrationType || "",
-
-        category: modalForm.category || "hypermarket",
-        paymentMode: modalForm.paymentMode || "cash",
-        companyTrnNumber: modalForm.companyTrnNumber || "",
-        transactionNumber: modalForm.transactionNumber || "",
-
-        state: modalForm.state || "Ajman",
-        country: "UAE",
-
-        // ✅ EXECUTIVE MUST BE ObjectId STRING
-        executive:
-          typeof modalForm.executive === "object"
-            ? modalForm.executive._id
-            : modalForm.executive,
-
-        // ✅ ITEMS NORMALIZED
-        items: (modalForm.items || []).map((i: any) => ({
-          barCode: i.barCode,
-          price: Number(i.price),
-        })),
+        state: modalForm.state || "Dubai",
+        enabled: modalForm.enabled ?? true,
       };
 
-      // 🔒 REQUIRED FIELD SAFETY
-      if (!payload.company || !payload.phone || !payload.executive) {
-        toast.error("Company, Phone and Executive are required");
+      if (!payload.name || !payload.phone) {
+        toast.error("Name and phone are required");
         return;
       }
 
       const res =
         modalMode === "create"
-          ? await CustomersService.create(payload)
-          : await CustomersService.updateItem(modalId!, payload);
+          ? await apiRequest("POST", "/api/employee/create", payload)
+          : await apiRequest(
+              "PATCH",
+              `/api/employee/update/${modalId}`,
+              payload
+            );
 
       if (!res?.success) throw new Error(res?.message);
 
       toast.success(
         modalMode === "create"
-          ? "Customer created successfully"
-          : "Customer updated successfully"
+          ? "Employee created successfully"
+          : "Employee updated successfully"
       );
 
       setModalOpen(false);
-      fetchCustomers();
+      fetchEmployees();
     } catch (err: any) {
       toast.error(err?.message || "Save failed");
     } finally {
@@ -217,11 +170,11 @@ const useCustomers = () => {
     try {
       setDeleting(true);
 
-      const res = await CustomersService.deleteItem(id);
+      const res = await EmployeeService.deleteItem(id);
       if (!res?.success) throw new Error();
 
       toast.success("Customer deleted successfully", { id: toastId });
-      fetchCustomers();
+      fetchEmployees();
     } catch {
       toast.error("Failed to delete customer", { id: toastId });
     } finally {
@@ -232,23 +185,19 @@ const useCustomers = () => {
   return {
     /* state */
     loading,
-    customers,
+    employees,
     page,
     pagination,
-
-    executives,
-    executiveSearch,
-    executiveLoading,
-
-    deleteId,
-    deleteName,
-    deleting,
-    deleteItem,
 
     modalOpen,
     modalMode,
     modalForm,
     modalLoading,
+
+    deleteId,
+    deleteName,
+    deleting,
+    deleteItem,
 
     /* actions */
     setPage,
@@ -259,13 +208,11 @@ const useCustomers = () => {
 
     openItemModal,
     openCreateModal,
-    saveCustomer,
+    saveEmployee,
 
     setModalForm,
     setModalOpen,
-
-    setExecutiveSearch,
   };
 };
 
-export default useCustomers;
+export default useEmployees;
