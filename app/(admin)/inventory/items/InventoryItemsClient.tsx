@@ -51,7 +51,6 @@ export default function InventoryItemsClient() {
     deleting,
     deleteItem,
     setDeleting,
-    
   } = useInventoryItems(barCode);
 
   return (
@@ -77,8 +76,8 @@ export default function InventoryItemsClient() {
 
       {/* ================= SEARCH + ADD ================= */}
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-         {/* ================= SEARCH ================= */}
-              <SearchInput onSearch={handleSearch} placeholder="Search item..." />
+        {/* ================= SEARCH ================= */}
+        <SearchInput onSearch={handleSearch} placeholder="Search item..." />
 
         <button
           onClick={() => openCreateModal(barCode)}
@@ -90,7 +89,7 @@ export default function InventoryItemsClient() {
       </div>
 
       {/* ================= TABLE ================= */}
-      <div className="hidden md:block bg-white border rounded-2xl shadow-sm overflow-hidden">
+      <div className="hidden md:block bg-white border rounded-2xl shadow-sm overflow-visible">
         <table className="w-full text-sm">
           <thead className="bg-gray-50">
             <tr>

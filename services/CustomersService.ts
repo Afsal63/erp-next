@@ -13,11 +13,7 @@ const CustomersService = {
     }),
 
   create: (payload: any) => {
-    const formData = new FormData();
-
-    formData.append("data", JSON.stringify(payload));
-
-    return apiRequest("POST", "/api/customer/create", formData);
+    return apiRequest("POST", "/api/customer/create", payload);
   },
 
   readById: (id: string) => apiRequest("GET", `/api/customer/read/${id}`),

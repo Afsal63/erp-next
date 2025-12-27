@@ -8,7 +8,7 @@ import { toast } from "sonner";
 const ITEMS_PER_PAGE = 10;
 
 const useCustomers = () => {
-   /* ================= STATE ================= */
+  /* ================= STATE ================= */
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -29,8 +29,9 @@ const useCustomers = () => {
 
   /* ================= MODAL ================= */
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalMode, setModalMode] =
-    useState<"view" | "edit" | "create">("view");
+  const [modalMode, setModalMode] = useState<"view" | "edit" | "create">(
+    "view"
+  );
   const [modalForm, setModalForm] = useState<any>({});
   const [modalId, setModalId] = useState<string | null>(null);
   const [modalLoading, setModalLoading] = useState(false);
@@ -55,10 +56,7 @@ const useCustomers = () => {
         );
       } else {
         // 📄 LIST API
-        res = await CustomersService.listCustomers(
-          pageNo,
-          ITEMS_PER_PAGE
-        );
+        res = await CustomersService.listCustomers(pageNo, ITEMS_PER_PAGE);
       }
 
       if (res?.success) {
@@ -92,7 +90,7 @@ const useCustomers = () => {
     fetchCustomers(1, trimmed);
   };
 
-   /* ================= EXECUTIVE SEARCH ================= */
+  /* ================= EXECUTIVE SEARCH ================= */
   useEffect(() => {
     if (!executiveSearch.trim()) {
       setExecutives([]);
@@ -154,10 +152,46 @@ const useCustomers = () => {
     try {
       setModalLoading(true);
 
+      // ✅ NORMALIZE PAYLOAD FOR BACKEND
+      const payload = {
+        company: modalForm.company?.trim(),
+        phone: modalForm.phone?.trim(),
+
+        address: modalForm.address || "",
+        location: modalForm.location || "",
+        registrationType: modalForm.registrationType || "",
+
+        category: modalForm.category || "hypermarket",
+        paymentMode: modalForm.paymentMode || "cash",
+        companyTrnNumber: modalForm.companyTrnNumber || "",
+        transactionNumber: modalForm.transactionNumber || "",
+
+        state: modalForm.state || "Ajman",
+        country: "UAE",
+
+        // ✅ EXECUTIVE MUST BE ObjectId STRING
+        executive:
+          typeof modalForm.executive === "object"
+            ? modalForm.executive._id
+            : modalForm.executive,
+
+        // ✅ ITEMS NORMALIZED
+        items: (modalForm.items || []).map((i: any) => ({
+          barCode: i.barCode,
+          price: Number(i.price),
+        })),
+      };
+
+      // 🔒 REQUIRED FIELD SAFETY
+      if (!payload.company || !payload.phone || !payload.executive) {
+        toast.error("Company, Phone and Executive are required");
+        return;
+      }
+
       const res =
         modalMode === "create"
-          ? await CustomersService.create(modalForm)
-          : await CustomersService.updateItem(modalId!, modalForm);
+          ? await CustomersService.create(payload)
+          : await CustomersService.updateItem(modalId!, payload);
 
       if (!res?.success) throw new Error(res?.message);
 

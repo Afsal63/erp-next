@@ -73,7 +73,7 @@ export default function CustomersPage() {
       <SearchInput onSearch={handleSearch} placeholder="Search customers..." />
 
       {/* ================= DESKTOP TABLE ================= */}
-      <div className="hidden md:block bg-white border rounded-2xl shadow-sm overflow-hidden">
+    + <div className="hidden md:block bg-white border rounded-2xl shadow-sm overflow-visible">
         <table className="w-full text-sm">
           <thead className="bg-gray-50">
             <tr>
