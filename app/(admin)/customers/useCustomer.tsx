@@ -1,3 +1,5 @@
+"use client";
+
 import apiRequest from "@/lib/apiRequest";
 import CustomersService from "@/services/CustomersService";
 import { Customer } from "@/types/customer";
@@ -47,7 +49,6 @@ const useCustomers = () => {
       let res;
 
       if (searchValue.trim()) {
-        // 🔍 SEARCH API
         res = await CustomersService.searchCustomers(
           pageNo,
           ITEMS_PER_PAGE,
@@ -55,7 +56,6 @@ const useCustomers = () => {
           "company"
         );
       } else {
-        // 📄 LIST API
         res = await CustomersService.listCustomers(pageNo, ITEMS_PER_PAGE);
       }
 
@@ -81,10 +81,9 @@ const useCustomers = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
-  /* ================= SEARCH (BUTTON ONLY) ================= */
+  /* ================= SEARCH ================= */
   const handleSearch = (value: string) => {
     const trimmed = value.trim();
-
     setSearch(trimmed);
     setPage(1);
     fetchCustomers(1, trimmed);
@@ -116,7 +115,7 @@ const useCustomers = () => {
       } finally {
         setExecutiveLoading(false);
       }
-    }, 400); // debounce
+    }, 400);
 
     return () => clearTimeout(delay);
   }, [executiveSearch]);
@@ -129,7 +128,32 @@ const useCustomers = () => {
 
       const res = await CustomersService.readById(id);
       if (res?.success) {
-        setModalForm(res.result);
+        const data = res.result;
+
+        // ✅ NORMALIZE DATA FOR MODAL (NO SIDE EFFECTS)
+        setModalForm({
+          ...data,
+
+          // ID for select/save
+          executive:
+            typeof data.executive === "object"
+              ? data.executive._id
+              : data.executive ?? "",
+
+          // 🔥 KEEP NAME FOR VIEW / EDIT DISPLAY
+          executiveName:
+            typeof data.executive === "object"
+              ? `${data.executive.name} ${data.executive.surname || ""}`
+              : "",
+
+          items: Array.isArray(data.items)
+            ? data.items.map((i: any) => ({
+                barCode: i.itemName ?? i.barCode ?? "",
+                price: String(i.price ?? ""),
+              }))
+            : [],
+        });
+
         setModalId(id);
         setModalOpen(true);
       }
@@ -143,16 +167,25 @@ const useCustomers = () => {
   const openCreateModal = () => {
     setModalMode("create");
     setModalId(null);
-    setModalForm({});
+    setModalForm({
+      company: "",
+      phone: "",
+      location: "",
+      category: "hypermarket",
+      paymentMode: "cash",
+      companyTrnNumber: "",
+      executive: "",
+      items: [],
+      status: "active",
+    });
     setModalOpen(true);
   };
 
-  /* ================= SAVE (CREATE / EDIT) ================= */
+  /* ================= SAVE ================= */
   const saveCustomer = async () => {
     try {
       setModalLoading(true);
 
-      // ✅ NORMALIZE PAYLOAD FOR BACKEND
       const payload = {
         company: modalForm.company?.trim(),
         phone: modalForm.phone?.trim(),
@@ -169,20 +202,18 @@ const useCustomers = () => {
         state: modalForm.state || "Ajman",
         country: "UAE",
 
-        // ✅ EXECUTIVE MUST BE ObjectId STRING
         executive:
           typeof modalForm.executive === "object"
             ? modalForm.executive._id
             : modalForm.executive,
 
-        // ✅ ITEMS NORMALIZED
+        // ✅ UI → BACKEND
         items: (modalForm.items || []).map((i: any) => ({
-          barCode: i.barCode,
+          itemName: i.barCode,
           price: Number(i.price),
         })),
       };
 
-      // 🔒 REQUIRED FIELD SAFETY
       if (!payload.company || !payload.phone || !payload.executive) {
         toast.error("Company, Phone and Executive are required");
         return;
@@ -230,7 +261,6 @@ const useCustomers = () => {
   };
 
   return {
-    /* state */
     loading,
     customers,
     page,
@@ -250,7 +280,6 @@ const useCustomers = () => {
     modalForm,
     modalLoading,
 
-    /* actions */
     setPage,
     handleSearch,
     setDeleteId,

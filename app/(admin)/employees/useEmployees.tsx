@@ -8,122 +8,69 @@ import { toast } from "sonner";
 const ITEMS_PER_PAGE = 10;
 
 const useEmployees = () => {
-  /* ================= STATE ================= */
   const [employees, setEmployees] = useState<Employee[]>([]);
   const [loading, setLoading] = useState(false);
-
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState<any>(null);
-
   const [search, setSearch] = useState("");
 
-  /* ================= DELETE ================= */
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteName, setDeleteName] = useState("");
   const [deleting, setDeleting] = useState(false);
 
-  /* ================= MODAL ================= */
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<"view" | "edit" | "create">(
     "view"
   );
   const [modalForm, setModalForm] = useState<any>({});
-  const [modalId, setModalId] = useState<string | null>(null);
   const [modalLoading, setModalLoading] = useState(false);
 
-  const [inventoryItems, setInventoryItems] = useState<any[]>([]);
-  const [inventoryLoading, setInventoryLoading] = useState(false);
-
-  const fetchInventoryByBarcode = async (barCode: string) => {
-    try {
-      setInventoryLoading(true);
-      const res = await InventoryItemService.listByBarcode(barCode, 1, 50, "");
-      setInventoryItems(res?.result || []);
-    } catch {
-      setInventoryItems([]);
-    } finally {
-      setInventoryLoading(false);
-    }
-  };
-
-  /* ================= FETCH ================= */
-  const fetchEmployees = async (
-    pageNo: number = page,
-    searchValue: string = search
-  ) => {
+  const fetchEmployees = async (pageNo = page, searchValue = search) => {
     try {
       setLoading(true);
+      const res = searchValue
+        ? await apiRequest(
+            "GET",
+            `/api/employee/search?q=${searchValue}&fields=name`
+          )
+        : await apiRequest(
+            "GET",
+            `/api/employee/list?page=${pageNo}&items=${ITEMS_PER_PAGE}`
+          );
 
-      let res;
-
-      if (searchValue.trim()) {
-        // 🔍 SEARCH EMPLOYEES
-        res = await apiRequest(
-          "GET",
-          `/api/employee/search?q=${searchValue.trim()}&fields=name`
-        );
-      } else {
-        // 📄 LIST EMPLOYEES
-        res = await apiRequest(
-          "GET",
-          `/api/employee/list?page=${pageNo}&items=${ITEMS_PER_PAGE}`
-        );
-      }
-
-      if (res?.success) {
-        setEmployees(res.result || []);
-        setPagination(res.pagination || null);
-      } else {
-        setEmployees([]);
-        setPagination(null);
-      }
-    } catch (err: any) {
-      toast.error(err?.message || "Failed to load employees");
-      setEmployees([]);
-      setPagination(null);
+      setEmployees(res?.success ? res.result : []);
+      setPagination(res?.pagination || null);
+    } catch {
+      toast.error("Failed to load employees");
     } finally {
       setLoading(false);
     }
   };
 
-  /* ================= PAGINATION ================= */
   useEffect(() => {
-    fetchEmployees(page, search);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchEmployees();
   }, [page]);
 
-  /* ================= SEARCH (BUTTON ONLY) ================= */
-  const handleSearch = (value: string) => {
-    const trimmed = value.trim();
-
-    setSearch(trimmed);
+  const handleSearch = (v: string) => {
+    setSearch(v.trim());
     setPage(1);
-    fetchEmployees(1, trimmed);
+    fetchEmployees(1, v.trim());
   };
 
-  /* ================= MODALS ================= */
-  const openItemModal = async (
-    id: string,
-    mode: "view" | "edit" | "delete"
-  ) => {
+  const openItemModal = async (id: string, mode: "view" | "edit") => {
     try {
-      setModalMode(mode === "delete" ? "view" : mode);
+      setModalMode(mode);
       setModalLoading(true);
-
       const res = await apiRequest("GET", `/api/employee/read/${id}`);
       if (res?.success) {
         setModalForm(res.result);
-        setModalId(id);
         setModalOpen(true);
       }
-    } catch {
-      toast.error("Failed to load employee");
     } finally {
       setModalLoading(false);
     }
   };
 
-  /* ================= MODAL OPENERS ================= */
   const openCreateModal = () => {
     setModalMode("create");
     setModalForm({
@@ -133,21 +80,37 @@ const useEmployees = () => {
       phonePrefix: "+971",
       department: "",
       position: "",
-      address: "",
-      state: "",
       items: [],
     });
-    setInventoryItems([]);
     setModalOpen(true);
   };
 
-  const openEditModal = (employee: Employee) => {
-    setModalMode("edit");
-    setModalForm(employee);
-    setModalOpen(true);
-  };
+const onBarcodeSelect = async (barCode: string) => {
+  try {
+    const res = await InventoryItemService.listByBarcode(barCode, 1, 100, "");
+    if (!res?.success) return;
 
-  /* ================= SAVE (CREATE / EDIT) ================= */
+    setModalForm((prev: any) => {
+      const existing = prev.items || [];
+      const existingMap = new Map(existing.map((i: any) => [i._id, i]));
+
+      const newItems = res.result
+        .filter((inv: any) => !existingMap.has(inv._id))
+        .map((inv: any) => ({
+          _id: inv._id,
+          barCode: inv.barCode,
+          itemName: inv.itemName,
+          actualQty: inv.quantity ?? inv.actualQty,
+          quantity: 0,
+        }));
+
+      return { ...prev, items: [...existing, ...newItems] };
+    });
+  } catch {
+    toast.error("Failed to load inventory items");
+  }
+};
+
   const saveEmployee = async () => {
     try {
       setModalLoading(true);
@@ -159,10 +122,15 @@ const useEmployees = () => {
 
       const payload = {
         ...modalForm,
-        items: (modalForm.items || []).map((i: any) => ({
-          barCode: i.barCode,
-          quantity: Number(i.quantity || 0),
-        })),
+
+        // ✅ INCLUDE itemName along with barCode & quantity
+        items: (modalForm.items || [])
+          .filter((i: any) => Number(i.quantity) > 0)
+          .map((i: any) => ({
+            barCode: i.barCode,
+            itemName: i.itemName, // ✅ NEW (important)
+            quantity: Number(i.quantity),
+          })),
       };
 
       const res =
@@ -179,14 +147,13 @@ const useEmployees = () => {
       );
 
       setModalOpen(false);
+      fetchEmployees();
     } catch (err: any) {
       toast.error(err?.message || "Failed to save employee");
     } finally {
       setModalLoading(false);
     }
   };
-
-  /* ================= DELETE ================= */
   const deleteItem = async (id: string) => {
     const toastId = toast.loading("Deleting customer...");
 
@@ -206,7 +173,6 @@ const useEmployees = () => {
   };
 
   return {
-    /* state */
     loading,
     employees,
     page,
@@ -220,9 +186,7 @@ const useEmployees = () => {
     deleteId,
     deleteName,
     deleting,
-    deleteItem,
 
-    /* actions */
     setPage,
     handleSearch,
     setDeleteId,
@@ -232,15 +196,11 @@ const useEmployees = () => {
     openItemModal,
     openCreateModal,
     saveEmployee,
-
-    setModalForm,
     setModalOpen,
+    setModalForm,
 
-    inventoryItems,
-    inventoryLoading,
-    fetchInventoryByBarcode,
-
-    openEditModal,
+    onBarcodeSelect,
+    deleteItem,
   };
 };
 

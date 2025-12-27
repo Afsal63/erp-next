@@ -14,6 +14,7 @@ export default function EmployeesPage() {
     employees,
     page,
     setPage,
+
     deleteId,
     deleteName,
     deleting,
@@ -21,6 +22,7 @@ export default function EmployeesPage() {
     setDeleteId,
     setDeleting,
     deleteItem,
+
     pagination,
     handleSearch,
     openItemModal,
@@ -29,45 +31,47 @@ export default function EmployeesPage() {
     modalOpen,
     modalMode,
     modalForm,
-    modalLoading, // ✅ ADD
+    modalLoading,
     setModalOpen,
     setModalForm,
     saveEmployee,
 
-    inventoryItems, // ✅ ADD
-    fetchInventoryByBarcode, // ✅ ADD
+    onBarcodeSelect,
   } = useEmployees();
 
   if (loading) {
     return (
-      <div className="p-6 text-gray-500 text-sm">Loading employees...</div>
+      <div className="p-6 text-gray-500 text-sm">
+        Loading employees...
+      </div>
     );
   }
 
   return (
     <div className="space-y-6 p-6">
       {/* ================= HEADER ================= */}
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold">Employees</h1>
-          <p className="text-sm text-gray-500">Manage your employee list</p>
+          <p className="text-sm text-gray-500">
+            Manage your employee list
+          </p>
         </div>
-      </div>
 
-      {/* ================= SEARCH + CREATE ================= */}
-      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <SearchInput
-          onSearch={handleSearch}
-          placeholder="Search employees..."
-        />
         <button
           onClick={openCreateModal}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
         >
           <Plus size={16} />
           Create Employee
         </button>
       </div>
+
+      {/* ================= SEARCH ================= */}
+      <SearchInput
+        onSearch={handleSearch}
+        placeholder="Search employees..."
+      />
 
       {/* ================= DESKTOP TABLE ================= */}
       <div className="hidden md:block bg-white border rounded-2xl shadow-sm overflow-visible">
@@ -78,7 +82,6 @@ export default function EmployeesPage() {
               <th className="p-4 text-left">Phone</th>
               <th className="p-4 text-left">Department</th>
               <th className="p-4 text-left">Position</th>
-              <th className="p-4 text-left">Location</th>
               <th className="p-4 text-left">Status</th>
               <th className="p-4 text-center">Actions</th>
             </tr>
@@ -97,11 +100,10 @@ export default function EmployeesPage() {
 
                 <td className="p-4">{e.department || "-"}</td>
                 <td className="p-4">{e.position || "-"}</td>
-                <td className="p-4">{e.address || "-"}</td>
 
                 <td className="p-4">
                   <span
-                    className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                    className={`px-3 py-1 rounded-full text-xs ${
                       e.enabled
                         ? "bg-green-100 text-green-700"
                         : "bg-gray-200 text-gray-600"
@@ -133,14 +135,14 @@ export default function EmployeesPage() {
         )}
       </div>
 
-      {/* ================= MOBILE VIEW ================= */}
+      {/* ================= MOBILE VIEW (RESTORED) ================= */}
       <div className="space-y-4 md:hidden">
         {employees.map((e) => (
           <div
             key={e._id}
             className="bg-white border rounded-2xl shadow-sm p-4 space-y-3"
           >
-            <div className="flex justify-between">
+            <div className="flex justify-between items-start">
               <div>
                 <h3 className="font-semibold">
                   {e.name} {e.surname || ""}
@@ -163,23 +165,22 @@ export default function EmployeesPage() {
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div>
                 <p className="text-gray-500">Department</p>
-                <p className="font-medium">{e.department || "-"}</p>
+                <p className="font-medium">
+                  {e.department || "-"}
+                </p>
               </div>
 
               <div>
                 <p className="text-gray-500">Position</p>
-                <p className="font-medium">{e.position || "-"}</p>
-              </div>
-
-              <div>
-                <p className="text-gray-500">Location</p>
-                <p className="font-medium">{e.address || "-"}</p>
+                <p className="font-medium">
+                  {e.position || "-"}
+                </p>
               </div>
 
               <div>
                 <p className="text-gray-500">Status</p>
                 <span
-                  className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${
+                  className={`inline-block px-2 py-0.5 rounded-full text-xs ${
                     e.enabled
                       ? "bg-green-100 text-green-700"
                       : "bg-gray-200 text-gray-600"
@@ -191,16 +192,22 @@ export default function EmployeesPage() {
             </div>
           </div>
         ))}
+
+        {employees.length === 0 && (
+          <div className="text-center text-gray-500 py-6">
+            No employees found
+          </div>
+        )}
       </div>
 
-      <EmployeeModal
+      {/* ================= EMPLOYEE MODAL ================= */}
+       <EmployeeModal
         open={modalOpen}
-        mode={modalMode === "view" ? "edit" : modalMode} // modal supports create/edit only
+        mode={modalMode === "view" ? "edit" : modalMode}
         loading={modalLoading}
         form={modalForm}
         setForm={setModalForm}
-        inventoryItems={inventoryItems}
-        onBarcodeSelect={fetchInventoryByBarcode}
+        onBarcodeSelect={onBarcodeSelect}
         onClose={() => setModalOpen(false)}
         onSave={saveEmployee}
       />

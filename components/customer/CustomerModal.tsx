@@ -3,7 +3,7 @@
 import { X, Plus, Trash2 } from "lucide-react";
 import FormSelect from "../ui/FormSelect";
 import FormInput from "../ui/FormInput";
-import {BARCODE_OPTIONS} from '@/constants/barcodes'
+import { BARCODE_OPTIONS } from "@/constants/barcodes";
 
 /* ================= TYPES ================= */
 
@@ -43,10 +43,7 @@ const CATEGORIES = [
 ];
 
 const TRN_OPTIONS = ["100614900700003", "nil"];
-
 const PAYMENT_MODES = ["cash", "credit 30 days", "bill to bill"];
-
-
 
 /* ================= COMPONENT ================= */
 
@@ -70,27 +67,6 @@ export default function CustomerModal({
   const update = (key: string, value: any) =>
     setForm((prev: any) => ({ ...prev, [key]: value }));
 
-  /* ================= BARCODE ================= */
-
-  const addBarcode = () =>
-    update("items", [...items, { barCode: "", price: "" }]);
-
-  const updateBarcode = (
-    index: number,
-    key: keyof BarcodeItem,
-    value: string
-  ) => {
-    const next = [...items];
-    next[index] = { ...next[index], [key]: value };
-    update("items", next);
-  };
-
-  const removeBarcode = (index: number) => {
-    const next = [...items];
-    next.splice(index, 1);
-    update("items", next);
-  };
-
   /* ================= VIEW MODE ================= */
 
   if (isView) {
@@ -111,14 +87,9 @@ export default function CustomerModal({
             <ViewRow label="Category" value={form.category} />
             <ViewRow label="Payment Mode" value={form.paymentMode} />
             <ViewRow label="Company TRN" value={form.companyTrnNumber} />
-            <ViewRow
-              label="Executive"
-              value={
-                safeExecutives.find((e) => e._id === form.executive)
-                  ? safeExecutives.find((e) => e._id === form.executive)?.name
-                  : "-"
-              }
-            />
+
+            {/* ✅ FIXED VIEW EXECUTIVE */}
+         <ViewRow label="Executive" value={form.executiveName || "-"} />
 
             <div>
               <p className="font-medium text-gray-600">Barcodes & Prices</p>
@@ -168,20 +139,33 @@ export default function CustomerModal({
           <FormSelect label="Payment Mode" value={form.paymentMode} options={PAYMENT_MODES} onChange={(v) => update("paymentMode", v)} />
           <FormSelect label="Company TRN" value={form.companyTrnNumber} options={TRN_OPTIONS} onChange={(v) => update("companyTrnNumber", v)} />
 
-          {/* Executive */}
+          {/* ================= EXECUTIVE ================= */}
           <div>
             <label className="text-xs font-medium text-gray-600">Executive</label>
+
             <input
               placeholder="Search executive..."
               onChange={(e) => onExecutiveSearch(e.target.value)}
               className="w-full mt-1 px-3 py-2 border rounded-lg text-sm"
             />
+
             <select
               value={form.executive || ""}
               onChange={(e) => update("executive", e.target.value)}
               className="w-full mt-2 px-3 py-2 border rounded-lg text-sm"
             >
               <option value="">Select Executive</option>
+
+              {/* ✅ BACKEND EXECUTIVE (EDIT MODE) */}
+              {form.executive &&
+                form.executiveName &&
+                !safeExecutives.some((e) => e._id === form.executive) && (
+                  <option value={form.executive}>
+                    {form.executiveName}
+                  </option>
+                )}
+
+              {/* SEARCH RESULTS */}
               {safeExecutives.map((e) => (
                 <option key={e._id} value={e._id}>
                   {e.name} {e.surname || ""}
@@ -190,7 +174,7 @@ export default function CustomerModal({
             </select>
           </div>
 
-          {/* ================= BARCODE SELECT ================= */}
+          {/* ================= BARCODE ================= */}
           <div>
             <label className="text-xs font-medium text-gray-600">
               Barcodes & Prices
@@ -200,30 +184,28 @@ export default function CustomerModal({
               <div key={i} className="flex gap-2 mt-2">
                 <select
                   value={item.barCode}
-                  onChange={(e) =>
-                    updateBarcode(i, "barCode", e.target.value)
-                  }
+                  onChange={(e) => update("items", items.map((it, idx) =>
+                    idx === i ? { ...it, barCode: e.target.value } : it
+                  ))}
                   className="flex-1 px-3 py-2 border rounded-lg text-sm"
                 >
                   <option value="">Select Barcode</option>
                   {BARCODE_OPTIONS.map((code) => (
-                    <option key={code} value={code}>
-                      {code}
-                    </option>
+                    <option key={code} value={code}>{code}</option>
                   ))}
                 </select>
 
                 <input
                   value={item.price}
-                  onChange={(e) =>
-                    updateBarcode(i, "price", e.target.value)
-                  }
+                  onChange={(e) => update("items", items.map((it, idx) =>
+                    idx === i ? { ...it, price: e.target.value } : it
+                  ))}
                   placeholder="Price"
                   className="w-24 px-3 py-2 border rounded-lg text-sm"
                 />
 
                 <button
-                  onClick={() => removeBarcode(i)}
+                  onClick={() => update("items", items.filter((_, idx) => idx !== i))}
                   className="p-2 bg-red-50 text-red-600 rounded-lg"
                 >
                   <Trash2 size={16} />
@@ -232,7 +214,7 @@ export default function CustomerModal({
             ))}
 
             <button
-              onClick={addBarcode}
+              onClick={() => update("items", [...items, { barCode: "", price: "" }])}
               className="mt-3 text-sm text-blue-600 flex items-center gap-2"
             >
               <Plus size={14} /> Add Barcode
