@@ -1,10 +1,12 @@
 "use client";
 
+import ConfirmModal from "@/components/ui/ConfirmModal";
 import useCustomers from "./useCustomer";
 import ActionDropdown from "@/components/ui/ActionDropdown";
 import Pagination from "@/components/ui/Pagination";
 import SearchInput from "@/components/ui/SearchInput";
 import { Search, Plus } from "lucide-react";
+import CustomerModal from "@/components/customer/CustomerModal";
 
 export default function CustomersPage() {
   const {
@@ -13,12 +15,29 @@ export default function CustomersPage() {
     page,
     setPage,
     pagination,
-    search,
     handleSearch,
-    setDeleteId,
-    setDeleteName,
+
     openItemModal,
     openCreateModal,
+
+    deleteId,
+    deleteName,
+    deleting,
+    deleteItem,
+    setDeleteId,
+    setDeleteName,
+    setDeleting,
+
+    modalOpen,
+    modalMode,
+    modalForm,
+    modalLoading,
+    saveCustomer,
+    setModalForm,
+    setModalOpen,
+
+    executives,
+    setExecutiveSearch,
   } = useCustomers();
 
   if (loading) {
@@ -197,6 +216,42 @@ export default function CustomersPage() {
         page={page}
         totalPages={pagination?.pages || 1}
         onPageChange={setPage}
+      />
+
+    
+      <CustomerModal
+        open={modalOpen}
+        mode={modalMode}
+        loading={modalLoading}
+        form={modalForm}
+        setForm={setModalForm}
+        onClose={() => setModalOpen(false)}
+        onSave={saveCustomer}
+        executives={executives}
+        onExecutiveSearch={setExecutiveSearch}
+      />
+    
+
+      <ConfirmModal
+        open={!!deleteId}
+        title="Delete Customer"
+        message={`Are you sure you want to delete "${deleteName}"?`}
+        loading={deleting}
+        onCancel={() => {
+          setDeleteId(null);
+          setDeleteName("");
+        }}
+        onConfirm={async () => {
+          if (!deleteId) return;
+          try {
+            setDeleting(true);
+            await deleteItem(deleteId);
+          } finally {
+            setDeleting(false);
+            setDeleteId(null);
+            setDeleteName("");
+          }
+        }}
       />
     </div>
   );

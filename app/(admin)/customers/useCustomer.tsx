@@ -1,26 +1,36 @@
+import apiRequest from "@/lib/apiRequest";
 import CustomersService from "@/services/CustomersService";
 import { Customer } from "@/types/customer";
+import { Executive } from "@/types/employee";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 const ITEMS_PER_PAGE = 10;
 
 const useCustomers = () => {
-  /* ================= STATE ================= */
+   /* ================= STATE ================= */
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(false);
 
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState<any>(null);
 
-  // committed search value (used for API)
   const [search, setSearch] = useState("");
 
+  /* ================= EXECUTIVES ================= */
+  const [executives, setExecutives] = useState<Executive[]>([]);
+  const [executiveSearch, setExecutiveSearch] = useState("");
+  const [executiveLoading, setExecutiveLoading] = useState(false);
+
+  /* ================= DELETE ================= */
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteName, setDeleteName] = useState("");
+  const [deleting, setDeleting] = useState(false);
 
+  /* ================= MODAL ================= */
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalMode, setModalMode] = useState<"view" | "edit" | "create">("view");
+  const [modalMode, setModalMode] =
+    useState<"view" | "edit" | "create">("view");
   const [modalForm, setModalForm] = useState<any>({});
   const [modalId, setModalId] = useState<string | null>(null);
   const [modalLoading, setModalLoading] = useState(false);
@@ -77,10 +87,41 @@ const useCustomers = () => {
   const handleSearch = (value: string) => {
     const trimmed = value.trim();
 
-    setSearch(trimmed);  // store committed search
-    setPage(1);          // reset pagination
-    fetchCustomers(1, trimmed); // 🔥 IMMEDIATE API CALL
+    setSearch(trimmed);
+    setPage(1);
+    fetchCustomers(1, trimmed);
   };
+
+   /* ================= EXECUTIVE SEARCH ================= */
+  useEffect(() => {
+    if (!executiveSearch.trim()) {
+      setExecutives([]);
+      return;
+    }
+
+    const delay = setTimeout(async () => {
+      try {
+        setExecutiveLoading(true);
+
+        const res = await apiRequest(
+          "GET",
+          `/api/employee/search?q=${executiveSearch}&fields=name`
+        );
+
+        if (res?.success) {
+          setExecutives(res.result || []);
+        } else {
+          setExecutives([]);
+        }
+      } catch {
+        setExecutives([]);
+      } finally {
+        setExecutiveLoading(false);
+      }
+    }, 400); // debounce
+
+    return () => clearTimeout(delay);
+  }, [executiveSearch]);
 
   /* ================= MODALS ================= */
   const openItemModal = async (id: string, mode: "view" | "edit") => {
@@ -108,28 +149,88 @@ const useCustomers = () => {
     setModalOpen(true);
   };
 
-  /* ================= RETURN ================= */
+  /* ================= SAVE (CREATE / EDIT) ================= */
+  const saveCustomer = async () => {
+    try {
+      setModalLoading(true);
+
+      const res =
+        modalMode === "create"
+          ? await CustomersService.create(modalForm)
+          : await CustomersService.updateItem(modalId!, modalForm);
+
+      if (!res?.success) throw new Error(res?.message);
+
+      toast.success(
+        modalMode === "create"
+          ? "Customer created successfully"
+          : "Customer updated successfully"
+      );
+
+      setModalOpen(false);
+      fetchCustomers();
+    } catch (err: any) {
+      toast.error(err?.message || "Save failed");
+    } finally {
+      setModalLoading(false);
+    }
+  };
+
+  /* ================= DELETE ================= */
+  const deleteItem = async (id: string) => {
+    const toastId = toast.loading("Deleting customer...");
+
+    try {
+      setDeleting(true);
+
+      const res = await CustomersService.deleteItem(id);
+      if (!res?.success) throw new Error();
+
+      toast.success("Customer deleted successfully", { id: toastId });
+      fetchCustomers();
+    } catch {
+      toast.error("Failed to delete customer", { id: toastId });
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return {
     /* state */
     loading,
     customers,
     page,
     pagination,
-    search,
+
+    executives,
+    executiveSearch,
+    executiveLoading,
+
+    deleteId,
+    deleteName,
+    deleting,
+    deleteItem,
+
+    modalOpen,
+    modalMode,
+    modalForm,
+    modalLoading,
 
     /* actions */
     setPage,
     handleSearch,
     setDeleteId,
     setDeleteName,
+    setDeleting,
+
     openItemModal,
     openCreateModal,
+    saveCustomer,
 
-    /* modal */
-    modalOpen,
-    modalMode,
-    modalForm,
-    modalLoading,
+    setModalForm,
+    setModalOpen,
+
+    setExecutiveSearch,
   };
 };
 

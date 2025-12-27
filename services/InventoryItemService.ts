@@ -7,7 +7,8 @@ const InventoryItemService = {
       "POST",
       `/api/inventory/filter?page=${page}&items=${items}&barCode=${barCode}&search=${search}`
     ),
-     create: (payload: any) => {
+  
+    create: (payload: any) => {
     const formData = new FormData();
 
     formData.append("data", JSON.stringify(payload));
