@@ -3,6 +3,7 @@
 import { X, Plus, Trash2 } from "lucide-react";
 import FormSelect from "../ui/FormSelect";
 import FormInput from "../ui/FormInput";
+import {BARCODE_OPTIONS} from '@/constants/barcodes'
 
 /* ================= TYPES ================= */
 
@@ -45,15 +46,7 @@ const TRN_OPTIONS = ["100614900700003", "nil"];
 
 const PAYMENT_MODES = ["cash", "credit 30 days", "bill to bill"];
 
-const BARCODE_OPTIONS = [
-  "9656222255661",
-  "9656332255662",
-  "9656442255663",
-  "9656552255664",
-  "9656662255665",
-  "9656772255666",
-  "9656112255660",
-];
+
 
 /* ================= COMPONENT ================= */
 

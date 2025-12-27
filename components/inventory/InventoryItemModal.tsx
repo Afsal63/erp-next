@@ -1,6 +1,7 @@
 "use client";
 
 import { X } from "lucide-react";
+import {BARCODE_OPTIONS} from '@/constants/barcodes'
 
 type Mode = "view" | "edit" | "create";
 
@@ -14,15 +15,7 @@ type Props = {
   onSave: () => void;
 };
 
-const BARCODE_OPTIONS = [
-  "9656222255661",
-  "9656332255662",
-  "9656442255663",
-  "9656552255664",
-  "9656662255665",
-  "9656772255666",
-  "9656112255660",
-];
+
 
 const UNIT_OPTIONS = ["Kg", "Numbers", "Grams", "Liters"];
 

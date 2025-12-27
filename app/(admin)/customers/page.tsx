@@ -55,7 +55,15 @@ export default function CustomersPage() {
           <p className="text-sm text-gray-500">Manage your customer list</p>
         </div>
 
-        {/* CREATE CUSTOMER */}
+        
+      </div>
+
+      {/* ================= SEARCH ================= */}
+
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+
+      <SearchInput onSearch={handleSearch} placeholder="Search customers..." />
+      {/* CREATE CUSTOMER */}
         <button
           onClick={openCreateModal}
           className="
@@ -67,10 +75,7 @@ export default function CustomersPage() {
           <Plus size={16} />
           Create Customer
         </button>
-      </div>
-
-      {/* ================= SEARCH ================= */}
-      <SearchInput onSearch={handleSearch} placeholder="Search customers..." />
+        </div>
 
       {/* ================= DESKTOP TABLE ================= */}
      <div className="hidden md:block bg-white border rounded-2xl shadow-sm overflow-visible">

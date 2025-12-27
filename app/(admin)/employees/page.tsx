@@ -6,6 +6,7 @@ import SearchInput from "@/components/ui/SearchInput";
 import { Plus } from "lucide-react";
 import useEmployees from "./useEmployees";
 import ConfirmModal from "@/components/ui/ConfirmModal";
+import EmployeeModal from "@/components/employee/EmployeeModal";
 
 export default function EmployeesPage() {
   const {
@@ -24,6 +25,17 @@ export default function EmployeesPage() {
     handleSearch,
     openItemModal,
     openCreateModal,
+
+    modalOpen,
+    modalMode,
+    modalForm,
+    modalLoading, // ✅ ADD
+    setModalOpen,
+    setModalForm,
+    saveEmployee,
+
+    inventoryItems, // ✅ ADD
+    fetchInventoryByBarcode, // ✅ ADD
   } = useEmployees();
 
   if (loading) {
@@ -40,7 +52,14 @@ export default function EmployeesPage() {
           <h1 className="text-2xl font-bold">Employees</h1>
           <p className="text-sm text-gray-500">Manage your employee list</p>
         </div>
+      </div>
 
+      {/* ================= SEARCH + CREATE ================= */}
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <SearchInput
+          onSearch={handleSearch}
+          placeholder="Search employees..."
+        />
         <button
           onClick={openCreateModal}
           className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 transition"
@@ -49,9 +68,6 @@ export default function EmployeesPage() {
           Create Employee
         </button>
       </div>
-
-      {/* ================= SEARCH ================= */}
-      <SearchInput onSearch={handleSearch} placeholder="Search employees..." />
 
       {/* ================= DESKTOP TABLE ================= */}
       <div className="hidden md:block bg-white border rounded-2xl shadow-sm overflow-visible">
@@ -137,7 +153,10 @@ export default function EmployeesPage() {
               <ActionDropdown
                 onShow={() => openItemModal(e._id, "view")}
                 onEdit={() => openItemModal(e._id, "edit")}
-                onDelete={() => openItemModal(e._id, "delete")}
+                onDelete={() => {
+                  setDeleteId(e._id);
+                  setDeleteName(e.name);
+                }}
               />
             </div>
 
@@ -174,9 +193,22 @@ export default function EmployeesPage() {
         ))}
       </div>
 
+      <EmployeeModal
+        open={modalOpen}
+        mode={modalMode === "view" ? "edit" : modalMode} // modal supports create/edit only
+        loading={modalLoading}
+        form={modalForm}
+        setForm={setModalForm}
+        inventoryItems={inventoryItems}
+        onBarcodeSelect={fetchInventoryByBarcode}
+        onClose={() => setModalOpen(false)}
+        onSave={saveEmployee}
+      />
+
+      {/* ================= DELETE CONFIRM ================= */}
       <ConfirmModal
         open={!!deleteId}
-        title="Delete Customer"
+        title="Delete Employee"
         message={`Are you sure you want to delete "${deleteName}"?`}
         loading={deleting}
         onCancel={() => {
@@ -196,6 +228,7 @@ export default function EmployeesPage() {
         }}
       />
 
+      {/* ================= PAGINATION ================= */}
       <Pagination
         page={page}
         totalPages={pagination?.pages || 1}

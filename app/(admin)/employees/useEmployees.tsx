@@ -1,5 +1,6 @@
 import apiRequest from "@/lib/apiRequest";
 import EmployeeService from "@/services/EmployeeService";
+import InventoryItemService from "@/services/InventoryItemService";
 import { Employee } from "@/types/employee";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -29,6 +30,21 @@ const useEmployees = () => {
   const [modalForm, setModalForm] = useState<any>({});
   const [modalId, setModalId] = useState<string | null>(null);
   const [modalLoading, setModalLoading] = useState(false);
+
+  const [inventoryItems, setInventoryItems] = useState<any[]>([]);
+  const [inventoryLoading, setInventoryLoading] = useState(false);
+
+  const fetchInventoryByBarcode = async (barCode: string) => {
+    try {
+      setInventoryLoading(true);
+      const res = await InventoryItemService.listByBarcode(barCode, 1, 50, "");
+      setInventoryItems(res?.result || []);
+    } catch {
+      setInventoryItems([]);
+    } finally {
+      setInventoryLoading(false);
+    }
+  };
 
   /* ================= FETCH ================= */
   const fetchEmployees = async (
@@ -107,10 +123,27 @@ const useEmployees = () => {
     }
   };
 
+  /* ================= MODAL OPENERS ================= */
   const openCreateModal = () => {
     setModalMode("create");
-    setModalId(null);
-    setModalForm({});
+    setModalForm({
+      name: "",
+      surname: "",
+      phone: "",
+      phonePrefix: "+971",
+      department: "",
+      position: "",
+      address: "",
+      state: "",
+      items: [],
+    });
+    setInventoryItems([]);
+    setModalOpen(true);
+  };
+
+  const openEditModal = (employee: Employee) => {
+    setModalMode("edit");
+    setModalForm(employee);
     setModalOpen(true);
   };
 
@@ -119,32 +152,23 @@ const useEmployees = () => {
     try {
       setModalLoading(true);
 
-      const payload = {
-        name: modalForm.name?.trim(),
-        surname: modalForm.surname?.trim(),
-        phone: modalForm.phone?.trim(),
-        phonePrefix: modalForm.phonePrefix || "+971",
-        email: modalForm.email || "",
-        department: modalForm.department || "",
-        position: modalForm.position || "",
-        address: modalForm.address || "",
-        state: modalForm.state || "Dubai",
-        enabled: modalForm.enabled ?? true,
-      };
-
-      if (!payload.name || !payload.phone) {
-        toast.error("Name and phone are required");
+      if (!modalForm.name || !modalForm.phone) {
+        toast.error("Name and Phone are required");
         return;
       }
 
+      const payload = {
+        ...modalForm,
+        items: (modalForm.items || []).map((i: any) => ({
+          barCode: i.barCode,
+          quantity: Number(i.quantity || 0),
+        })),
+      };
+
       const res =
         modalMode === "create"
-          ? await apiRequest("POST", "/api/employee/create", payload)
-          : await apiRequest(
-              "PATCH",
-              `/api/employee/update/${modalId}`,
-              payload
-            );
+          ? await EmployeeService.create(payload)
+          : await EmployeeService.update(modalForm._id, payload);
 
       if (!res?.success) throw new Error(res?.message);
 
@@ -155,9 +179,8 @@ const useEmployees = () => {
       );
 
       setModalOpen(false);
-      fetchEmployees();
     } catch (err: any) {
-      toast.error(err?.message || "Save failed");
+      toast.error(err?.message || "Failed to save employee");
     } finally {
       setModalLoading(false);
     }
@@ -212,6 +235,12 @@ const useEmployees = () => {
 
     setModalForm,
     setModalOpen,
+
+    inventoryItems,
+    inventoryLoading,
+    fetchInventoryByBarcode,
+
+    openEditModal,
   };
 };
 
