@@ -1,6 +1,8 @@
 "use client";
 
 import { X, Plus, Trash2 } from "lucide-react";
+import FormSelect from "../ui/FormSelect";
+import FormInput from "../ui/FormInput";
 
 /* ================= TYPES ================= */
 
@@ -126,28 +128,28 @@ export default function CustomerModal({
 
         {/* ================= BODY ================= */}
         <div className="p-5 space-y-4 overflow-y-auto">
-          <Input
+          <FormInput
             label="Company Name"
             value={form.company}
             disabled={isView}
             onChange={(v) => update("company", v)}
           />
 
-          <Input
+          <FormInput
             label="Phone"
             value={form.phone}
             disabled={isView}
             onChange={(v) => update("phone", v)}
           />
 
-          <Input
+          <FormInput
             label="Location"
             value={form.location}
             disabled={isView}
             onChange={(v) => update("location", v)}
           />
 
-          <Select
+          <FormSelect
             label="Category"
             value={form.category}
             disabled={isView}
@@ -155,7 +157,7 @@ export default function CustomerModal({
             onChange={(v) => update("category", v)}
           />
 
-          <Select
+          <FormSelect
             label="Company TRN"
             value={form.companyTrnNumber}
             disabled={isView}
@@ -164,39 +166,39 @@ export default function CustomerModal({
           />
 
           {/* ================= EXECUTIVE ================= */}
-<div>
-  <label className="text-xs font-medium text-gray-600">
-    Executive
-  </label>
+          <div>
+            <label className="text-xs font-medium text-gray-600">
+              Executive
+            </label>
 
-  {!isView && (
-    <input
-      placeholder="Search executive..."
-      onChange={(e) => onExecutiveSearch(e.target.value)}
-      className="w-full mt-1 px-3 py-2 border rounded-lg text-sm"
-    />
-  )}
+            {!isView && (
+              <input
+                placeholder="Search executive..."
+                onChange={(e) => onExecutiveSearch(e.target.value)}
+                className="w-full mt-1 px-3 py-2 border rounded-lg text-sm"
+              />
+            )}
 
-  <select
-    value={form.executive?._id || ""}
-    disabled={isView}
-    onChange={(e) =>
-      update(
-        "executive",
-        safeExecutives.find((ex) => ex._id === e.target.value)
-      )
-    }
-    className="w-full mt-2 px-3 py-2 border rounded-lg text-sm"
-  >
-    <option value="">Select Executive</option>
+            <select
+              value={form.executive?._id || ""}
+              disabled={isView}
+              onChange={(e) =>
+                update(
+                  "executive",
+                  safeExecutives.find((ex) => ex._id === e.target.value)
+                )
+              }
+              className="w-full mt-2 px-3 py-2 border rounded-lg text-sm"
+            >
+              <option value="">Select Executive</option>
 
-    {safeExecutives.map((e) => (
-      <option key={e._id} value={e._id}>
-        {e.name} {e.surname || ""}
-      </option>
-    ))}
-  </select>
-</div>
+              {safeExecutives.map((e) => (
+                <option key={e._id} value={e._id}>
+                  {e.name} {e.surname || ""}
+                </option>
+              ))}
+            </select>
+          </div>
 
           {/* ================= BARCODE + PRICE ================= */}
           <div>
@@ -221,9 +223,7 @@ export default function CustomerModal({
                     placeholder="Price"
                     value={item.price}
                     disabled={isView}
-                    onChange={(e) =>
-                      updateBarcode(i, "price", e.target.value)
-                    }
+                    onChange={(e) => updateBarcode(i, "price", e.target.value)}
                     className="w-24 px-3 py-2 border rounded-lg text-sm"
                   />
 
@@ -249,7 +249,7 @@ export default function CustomerModal({
             )}
           </div>
 
-          <Select
+          <FormSelect
             label="Status"
             value={form.status || "active"}
             disabled={isView}
@@ -273,11 +273,7 @@ export default function CustomerModal({
               disabled={loading}
               className="flex-1 px-4 py-2 rounded-lg bg-blue-600 text-white text-sm disabled:opacity-60"
             >
-              {loading
-                ? "Saving..."
-                : mode === "create"
-                ? "Create"
-                : "Update"}
+              {loading ? "Saving..." : mode === "create" ? "Create" : "Update"}
             </button>
           )}
         </div>
@@ -285,64 +281,3 @@ export default function CustomerModal({
     </div>
   );
 }
-
-/* ================= REUSABLE INPUTS ================= */
-
-const Input = ({
-  label,
-  value,
-  onChange,
-  disabled,
-}: {
-  label: string;
-  value?: string;
-  onChange: (v: string) => void;
-  disabled?: boolean;
-}) => (
-  <div>
-    <label className="text-xs font-medium text-gray-600">{label}</label>
-    <input
-      value={value || ""}
-      disabled={disabled}
-      onChange={(e) => onChange(e.target.value)}
-      className="w-full mt-1 px-3 py-2 border rounded-lg text-sm"
-    />
-  </div>
-);
-
-const Select = ({
-  label,
-  value,
-  options,
-  onChange,
-  disabled,
-}: {
-  label: string;
-  value?: string;
-  options: any[];
-  onChange: (v: string) => void;
-  disabled?: boolean;
-}) => (
-  <div>
-    <label className="text-xs font-medium text-gray-600">{label}</label>
-    <select
-      value={value || ""}
-      disabled={disabled}
-      onChange={(e) => onChange(e.target.value)}
-      className="w-full mt-1 px-3 py-2 border rounded-lg text-sm"
-    >
-      <option value="">Select</option>
-      {options.map((o) =>
-        typeof o === "string" ? (
-          <option key={o} value={o}>
-            {o}
-          </option>
-        ) : (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        )
-      )}
-    </select>
-  </div>
-);
