@@ -87,39 +87,44 @@ const useEmployees = () => {
   };
 
   const onBarcodeSelect = async (barCode: string) => {
-    try {
-      const res = await InventoryItemService.listByBarcode(barCode, 1, 100, "");
-      if (!res?.success) return;
+  try {
+    const res = await InventoryItemService.listByBarcode(barCode, 1, 100, "");
+    if (!res?.success) return;
 
-      setModalForm((prev: any) => {
-        const existing = prev.items || [];
-        const existingMap = new Map(existing.map((i: any) => [i._id, i]));
+    setModalForm((prev: any) => {
+      const existing = prev.items || [];
 
-        const newItems = res.result
-          .filter((inv: any) => !existingMap.has(inv._id))
-          .map((inv: any) => ({
-            _id: inv._id,
-            barCode: inv.barCode,
-            itemName: inv.itemName,
+      // 🔑 unique key = barCode + itemName
+      const existingKeySet = new Set(
+        existing.map((i: any) => `${i.barCode}__${i.itemName}`)
+      );
 
-            // ✅ AVAILABLE QTY comes from inventory
-            availableQty: inv.quantity,
+      const newItems = res.result
+        .filter(
+          (inv: any) =>
+            !existingKeySet.has(`${inv.barCode}__${inv.itemName}`)
+        )
+        .map((inv: any) => ({
+          _id: inv._id,
+          barCode: inv.barCode,
+          itemName: inv.itemName,
 
-            // ✅ actualQty ONLY if backend explicitly sends it
-            ...(typeof inv.actualQty !== "undefined"
-              ? { actualQty: inv.actualQty }
-              : {}),
+          // ✅ inventory-based available qty ONLY for newly added
+          availableQty: inv.quantity,
 
-            // employee assignment
-            quantity: 0,
-          }));
+          // ❌ do NOT set actualQty here
+          quantity: 0,
+        }));
 
-        return { ...prev, items: [...existing, ...newItems] };
-      });
-    } catch {
-      toast.error("Failed to load inventory items");
-    }
-  };
+      // ⛔ if nothing new, return prev state
+      if (newItems.length === 0) return prev;
+
+      return { ...prev, items: [...existing, ...newItems] };
+    });
+  } catch {
+    toast.error("Failed to load inventory items");
+  }
+};
 
   const saveEmployee = async () => {
     try {

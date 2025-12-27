@@ -73,12 +73,19 @@ export default function EmployeeModal({
     onBarcodeSelect(barCode); // 🔒 untouched
   };
 
+  // ✅ Remove only ONE item (row-level remove)
+  const removeItemById = (id: string) => {
+    setForm((prev: any) => ({
+      ...prev,
+      items: (prev.items || []).filter((i: any) => i._id !== id),
+    }));
+  };
+
+  // ✅ Remove ALL items under a barcode (tag-level remove)
   const removeBarcode = (barCode: string) => {
     setForm((prev: any) => ({
       ...prev,
-      items: (prev.items || []).filter(
-        (i: any) => i.barCode !== barCode
-      ),
+      items: (prev.items || []).filter((i: any) => i.barCode !== barCode),
     }));
   };
 
@@ -103,50 +110,38 @@ export default function EmployeeModal({
           <FormInput
             label="Name"
             value={form.name || ""}
-            onChange={(v) =>
-              setForm((p: any) => ({ ...p, name: v }))
-            }
+            onChange={(v) => setForm((p: any) => ({ ...p, name: v }))}
           />
 
           <FormInput
             label="Surname"
             value={form.surname || ""}
-            onChange={(v) =>
-              setForm((p: any) => ({ ...p, surname: v }))
-            }
+            onChange={(v) => setForm((p: any) => ({ ...p, surname: v }))}
           />
-           <FormInput
+          <FormInput
             label="email"
             value={form.email || ""}
-            onChange={(v) =>
-              setForm((p: any) => ({ ...p, email: v }))
-            }
+            onChange={(v) => setForm((p: any) => ({ ...p, email: v }))}
           />
 
           <FormInput
             label="Phone"
             value={form.phone || ""}
-            onChange={(v) =>
-              setForm((p: any) => ({ ...p, phone: v }))
-            }
+            onChange={(v) => setForm((p: any) => ({ ...p, phone: v }))}
           />
 
           <FormSelect
             label="Department"
             value={form.department || ""}
             options={DEPARTMENTS}
-            onChange={(v) =>
-              setForm((p: any) => ({ ...p, department: v }))
-            }
+            onChange={(v) => setForm((p: any) => ({ ...p, department: v }))}
           />
 
           <FormSelect
             label="Position"
             value={form.position || ""}
             options={POSITIONS}
-            onChange={(v) =>
-              setForm((p: any) => ({ ...p, position: v }))
-            }
+            onChange={(v) => setForm((p: any) => ({ ...p, position: v }))}
           />
 
           {/* ================= BARCODE SELECT ================= */}
@@ -179,22 +174,17 @@ export default function EmployeeModal({
 
           {/* ================= ITEMS ================= */}
           {(form.items || []).map((item: any, i: number) => (
-            <div
-              key={item._id}
-              className="border p-3 rounded-lg space-y-2"
-            >
+            <div key={item._id} className="border p-3 rounded-lg space-y-2">
               <div className="flex justify-between items-start">
                 <div>
-                  <p className="text-sm font-semibold">
-                    {item.itemName}
-                  </p>
+                  <p className="text-sm font-semibold">{item.itemName}</p>
                   <p className="text-xs text-gray-500">
                     Barcode: {item.barCode}
                   </p>
                 </div>
 
                 <button
-                  onClick={() => removeBarcode(item.barCode)}
+                  onClick={() => removeItemById(item._id)}
                   className="text-red-500"
                 >
                   <X size={14} />
@@ -250,12 +240,13 @@ export default function EmployeeModal({
                 </div>
 
                 {/* AVAILABLE QTY — READ ONLY */}
-                <div>
-                  <p className="text-gray-500">Available Qty</p>
-                  <p className="font-medium">
-                    {item.availableQty ?? item.actualQty}
-                  </p>
-                </div>
+                {/* AVAILABLE QTY — ONLY FOR NEWLY ADDED INVENTORY ITEMS */}
+                {typeof item.availableQty !== "undefined" && (
+                  <div>
+                    <p className="text-gray-500">Available Qty</p>
+                    <p className="font-medium">{item.availableQty}</p>
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -263,10 +254,7 @@ export default function EmployeeModal({
 
         {/* ================= FOOTER ================= */}
         <div className="p-4 border-t flex gap-3 shrink-0">
-          <button
-            onClick={onClose}
-            className="flex-1 border rounded-lg"
-          >
+          <button onClick={onClose} className="flex-1 border rounded-lg">
             Cancel
           </button>
           <button
