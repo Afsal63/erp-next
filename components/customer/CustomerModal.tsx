@@ -45,6 +45,16 @@ const TRN_OPTIONS = ["100614900700003", "nil"];
 
 const PAYMENT_MODES = ["cash", "credit 30 days", "bill to bill"];
 
+const BARCODE_OPTIONS = [
+  "9656222255661",
+  "9656332255662",
+  "9656442255663",
+  "9656552255664",
+  "9656662255665",
+  "9656772255666",
+  "9656112255660",
+];
+
 /* ================= COMPONENT ================= */
 
 export default function CustomerModal({
@@ -63,8 +73,6 @@ export default function CustomerModal({
   const isView = mode === "view";
   const safeExecutives = Array.isArray(executives) ? executives : [];
   const items: BarcodeItem[] = Array.isArray(form.items) ? form.items : [];
-
-  /* ================= HELPERS ================= */
 
   const update = (key: string, value: any) =>
     setForm((prev: any) => ({ ...prev, [key]: value }));
@@ -114,7 +122,7 @@ export default function CustomerModal({
               label="Executive"
               value={
                 safeExecutives.find((e) => e._id === form.executive)
-                  ? `${safeExecutives.find((e) => e._id === form.executive)?.name}`
+                  ? safeExecutives.find((e) => e._id === form.executive)?.name
                   : "-"
               }
             />
@@ -189,7 +197,7 @@ export default function CustomerModal({
             </select>
           </div>
 
-          {/* Barcodes */}
+          {/* ================= BARCODE SELECT ================= */}
           <div>
             <label className="text-xs font-medium text-gray-600">
               Barcodes & Prices
@@ -197,18 +205,30 @@ export default function CustomerModal({
 
             {items.map((item, i) => (
               <div key={i} className="flex gap-2 mt-2">
-                <input
+                <select
                   value={item.barCode}
-                  onChange={(e) => updateBarcode(i, "barCode", e.target.value)}
-                  placeholder="Barcode"
+                  onChange={(e) =>
+                    updateBarcode(i, "barCode", e.target.value)
+                  }
                   className="flex-1 px-3 py-2 border rounded-lg text-sm"
-                />
+                >
+                  <option value="">Select Barcode</option>
+                  {BARCODE_OPTIONS.map((code) => (
+                    <option key={code} value={code}>
+                      {code}
+                    </option>
+                  ))}
+                </select>
+
                 <input
                   value={item.price}
-                  onChange={(e) => updateBarcode(i, "price", e.target.value)}
+                  onChange={(e) =>
+                    updateBarcode(i, "price", e.target.value)
+                  }
                   placeholder="Price"
                   className="w-24 px-3 py-2 border rounded-lg text-sm"
                 />
+
                 <button
                   onClick={() => removeBarcode(i)}
                   className="p-2 bg-red-50 text-red-600 rounded-lg"
