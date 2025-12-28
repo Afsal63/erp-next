@@ -31,10 +31,18 @@ type Executive = {
   items: ExecutiveItem[];
 };
 
+type CustomerItem = {
+  _id: string;
+  itemName: string;
+  barCode: string;
+  price: number;
+};
+
 type Client = {
   _id: string;
   company: string;
   executive?: Executive;
+  items?: CustomerItem[];
 };
 
 type ItemRow = {
@@ -165,15 +173,25 @@ export default function SaleOrderModal({
   const handleBarcodeSelect = (barCode: string) => {
     setSelectedBarcode("");
 
-    const related =
-      form.executiveItems?.filter((i: any) => i.barCode === barCode) || [];
+    // ❌ BLOCK DUPLICATE BARCODE
+    if (items.some((i) => i.barCode === barCode)) return;
 
-    const rows: ItemRow[] = related.map((i: any) => ({
+    const execItems =
+      form.executiveItems?.filter(
+        (i: ExecutiveItem) => i.barCode === barCode
+      ) || [];
+
+    // ✅ PRICE ONLY FROM customer.items
+    const customerPrice =
+      form.customerItems?.find((ci: CustomerItem) => ci.barCode === barCode)
+        ?.price ?? 0;
+
+    const rows: ItemRow[] = execItems.map((i: any) => ({
       barCode: i.barCode,
       itemName: i.itemName,
-      quantity: 1,
-      price: Number(i.price || 0),
-      total: Number(i.price || 0),
+      quantity: 0,
+      price: customerPrice,
+      total: customerPrice,
     }));
 
     recalcTotals([...items, ...rows]);
@@ -220,7 +238,7 @@ export default function SaleOrderModal({
                 placeholder="Search Here"
                 onChange={(e) => {
                   setLoadingCustomers(true);
-                  onCustomerSearch(e.target.value);
+                  onCustomerSearch(e.target.value); // ✅ SEARCH ONLY
                 }}
                 className="w-full mt-1 px-3 py-2 border rounded-lg"
               />
@@ -232,28 +250,26 @@ export default function SaleOrderModal({
                 onChange={(e) => {
                   const c = customers.find((x) => x._id === e.target.value);
 
-                  if (!c?.executive) {
-                    setForm((p: any) => ({
-                      ...p,
-                      client: c?._id || "",
-                      clientName: c?.company || "",
-                      executive: "",
-                      executiveName: "",
-                      executiveItems: [],
-                      items: [],
-                    }));
-                    return;
-                  }
+                  // ✅ TS SAFE GUARD
+                  if (!c) return;
 
-                  const exec = c.executive;
+                  const exec = c.executive; // may be undefined
 
                   setForm((p: any) => ({
                     ...p,
                     client: c._id,
                     clientName: c.company,
-                    executive: exec._id,
-                    executiveName: `${exec.name} ${exec.surname || ""}`,
-                    executiveItems: exec.items,
+
+                    // ✅ PRICE SOURCE (SAFE)
+                    customerItems: c.items || [],
+
+                    // ✅ EXECUTIVE (SAFE)
+                    executive: exec?._id || "",
+                    executiveName: exec
+                      ? `${exec.name} ${exec.surname || ""}`
+                      : "",
+                    executiveItems: exec?.items || [],
+
                     items: [],
                   }));
                 }}
