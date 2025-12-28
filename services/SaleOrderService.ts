@@ -7,7 +7,7 @@ const SaleOrderService = {
   search: (page: number, limit: number, query: string) =>
     apiRequest(
       "GET",
-      `/api/saleOrder/list?page=${page}&items=${limit}&search=${query}`
+      `/api/saleOrder/search?page=${page}&items=${limit}&search=${query}`
     ),
 
   readById: (id: string) =>

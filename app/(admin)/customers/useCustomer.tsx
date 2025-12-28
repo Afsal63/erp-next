@@ -170,76 +170,76 @@ const useCustomers = () => {
     setModalForm({
       company: "",
       phone: "",
+      address: "",
       location: "",
-      category: "hypermarket",
-      paymentMode: "cash",
+      category: "",
+      paymentMode: "",
       companyTrnNumber: "",
+      clientTrnNumber: "",
+      registrationType: "",
+      state: "",
+      country: "UAE",
       executive: "",
       items: [],
-      status: "active",
     });
     setModalOpen(true);
   };
 
   /* ================= SAVE ================= */
   const saveCustomer = async () => {
-    try {
-      setModalLoading(true);
+  try {
+    setModalLoading(true);
 
-      const payload = {
-        company: modalForm.company?.trim(),
-        phone: modalForm.phone?.trim(),
+    const payload = {
+      company: modalForm.company?.trim(),
+      phone: modalForm.phone?.trim(),
+      address: modalForm.address || "",
+      location: modalForm.location || "",
+      category: modalForm.category,
+      paymentMode: modalForm.paymentMode,
+      companyTrnNumber: modalForm.companyTrnNumber,
+      clientTrnNumber: modalForm.clientTrnNumber,
+      state: modalForm.state,
+      country: "UAE",
 
-        address: modalForm.address || "",
-        location: modalForm.location || "",
-        registrationType: modalForm.registrationType || "",
+      executive:
+        typeof modalForm.executive === "object"
+          ? modalForm.executive._id
+          : modalForm.executive,
 
-        category: modalForm.category || "hypermarket",
-        paymentMode: modalForm.paymentMode || "cash",
-        companyTrnNumber: modalForm.companyTrnNumber || "",
-        transactionNumber: modalForm.transactionNumber || "",
+      // ✅ IMPORTANT FIX
+      items: (modalForm.items || []).map((i: any) => ({
+        barCode: i.barCode,      // ✅ REQUIRED BY BACKEND
+        price: Number(i.price),
+      })),
+    };
 
-        state: modalForm.state || "Ajman",
-        country: "UAE",
-
-        executive:
-          typeof modalForm.executive === "object"
-            ? modalForm.executive._id
-            : modalForm.executive,
-
-        // ✅ UI → BACKEND
-        items: (modalForm.items || []).map((i: any) => ({
-          itemName: i.barCode,
-          price: Number(i.price),
-        })),
-      };
-
-      if (!payload.company || !payload.phone || !payload.executive) {
-        toast.error("Company, Phone and Executive are required");
-        return;
-      }
-
-      const res =
-        modalMode === "create"
-          ? await CustomersService.create(payload)
-          : await CustomersService.updateItem(modalId!, payload);
-
-      if (!res?.success) throw new Error(res?.message);
-
-      toast.success(
-        modalMode === "create"
-          ? "Customer created successfully"
-          : "Customer updated successfully"
-      );
-
-      setModalOpen(false);
-      fetchCustomers();
-    } catch (err: any) {
-      toast.error(err?.message || "Save failed");
-    } finally {
-      setModalLoading(false);
+    if (!payload.company || !payload.phone || !payload.executive) {
+      toast.error("Company, Phone and Executive are required");
+      return;
     }
-  };
+
+    const res =
+      modalMode === "create"
+        ? await CustomersService.create(payload)
+        : await CustomersService.updateItem(modalId!, payload);
+
+    if (!res?.success) throw new Error(res?.message);
+
+    toast.success(
+      modalMode === "create"
+        ? "Customer created successfully"
+        : "Customer updated successfully"
+    );
+
+    setModalOpen(false);
+    fetchCustomers();
+  } catch (err: any) {
+    toast.error(err?.message || "Save failed");
+  } finally {
+    setModalLoading(false);
+  }
+};
 
   /* ================= DELETE ================= */
   const deleteItem = async (id: string) => {

@@ -22,13 +22,17 @@ const useSaleOrders = () => {
     try {
       setLoading(true);
 
-      const res = searchValue
-        ? await SaleOrderService.search(
-            pageNo,
-            ITEMS_PER_PAGE,
-            searchValue
-          )
-        : await SaleOrderService.list(pageNo, ITEMS_PER_PAGE);
+      let res;
+
+      if (searchValue.trim()) {
+        res = await SaleOrderService.search(
+          pageNo,
+          ITEMS_PER_PAGE,
+          searchValue.trim()
+        );
+      } else {
+        res = await SaleOrderService.list(pageNo, ITEMS_PER_PAGE);
+      }
 
       if (res?.success) {
         setOrders(res.result || []);
@@ -40,19 +44,24 @@ const useSaleOrders = () => {
     } catch {
       toast.error("Failed to load sale orders");
       setOrders([]);
+      setPagination(null);
     } finally {
       setLoading(false);
     }
   };
 
+  /* ✅ IMPORTANT FIX */
   useEffect(() => {
-    fetchOrders(page);
+    fetchOrders(page, search);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
+  /* ================= SEARCH ================= */
   const handleSearch = (value: string) => {
-    setSearch(value.trim());
+    const trimmed = value.trim();
+    setSearch(trimmed);
     setPage(1);
-    fetchOrders(1, value.trim());
+    fetchOrders(1, trimmed);
   };
 
   return {

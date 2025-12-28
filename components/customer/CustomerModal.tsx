@@ -42,8 +42,19 @@ const CATEGORIES = [
   "day-to-day-international",
 ];
 
-const TRN_OPTIONS = ["100614900700003", "nil"];
 const PAYMENT_MODES = ["cash", "credit 30 days", "bill to bill"];
+
+const STATES = [
+  "Ajman",
+  "Rasal Kaim",
+  "Fujaira",
+  "Dubai",
+  "Abudabi",
+  "Sharja",
+  "Alain",
+];
+
+const TRN_OPTIONS = ["100614900700003", "nil"];
 
 /* ================= COMPONENT ================= */
 
@@ -65,7 +76,20 @@ export default function CustomerModal({
   const items: BarcodeItem[] = Array.isArray(form.items) ? form.items : [];
 
   const update = (key: string, value: any) =>
-    setForm((prev: any) => ({ ...prev, [key]: value }));
+    setForm((prev: any) => ({
+      ...prev,
+      [key]: value,
+    }));
+
+  /* ================= CATEGORY CHANGE ================= */
+  const handleCategoryChange = (value: string) => {
+    setForm((prev: any) => ({
+      ...prev,
+      category: value,
+      paymentMode: prev.paymentMode || "credit 30 days", // auto-set once
+      country: "UAE",
+    }));
+  };
 
   /* ================= VIEW MODE ================= */
 
@@ -73,7 +97,7 @@ export default function CustomerModal({
     return (
       <div className="fixed inset-0 z-50 bg-black/40 flex items-end md:items-center md:justify-center">
         <div className="w-full md:max-w-xl bg-white rounded-t-2xl md:rounded-2xl shadow-lg">
-          <div className="flex justify-between items-center px-5 py-4 border-b">
+          <div className="flex justify-between px-5 py-4 border-b">
             <h2 className="text-lg font-semibold">Customer Details</h2>
             <button onClick={onClose}>
               <X size={18} />
@@ -84,12 +108,13 @@ export default function CustomerModal({
             <ViewRow label="Company" value={form.company} />
             <ViewRow label="Phone" value={form.phone} />
             <ViewRow label="Location" value={form.location} />
+            <ViewRow label="State" value={form.state} />
             <ViewRow label="Category" value={form.category} />
             <ViewRow label="Payment Mode" value={form.paymentMode} />
             <ViewRow label="Company TRN" value={form.companyTrnNumber} />
-
-            {/* ✅ FIXED VIEW EXECUTIVE */}
-         <ViewRow label="Executive" value={form.executiveName || "-"} />
+            <ViewRow label="Client TRN" value={form.clientTrnNumber} />
+            <ViewRow label="Country" value="UAE" />
+            <ViewRow label="Executive" value={form.executiveName || "-"} />
 
             <div>
               <p className="font-medium text-gray-600">Barcodes & Prices</p>
@@ -104,10 +129,7 @@ export default function CustomerModal({
           </div>
 
           <div className="p-4 border-t">
-            <button
-              onClick={onClose}
-              className="w-full px-4 py-2 border rounded-lg"
-            >
+            <button onClick={onClose} className="w-full border rounded-lg py-2">
               Close
             </button>
           </div>
@@ -120,8 +142,8 @@ export default function CustomerModal({
 
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-end md:items-center md:justify-center">
-      <div className="w-full md:max-w-xl bg-white rounded-t-2xl md:rounded-2xl shadow-lg max-h-[90vh] flex flex-col">
-        <div className="flex justify-between items-center px-5 py-4 border-b">
+      <div className="w-full md:max-w-3xl bg-white rounded-t-2xl md:rounded-2xl shadow-lg max-h-[90vh] flex flex-col">
+        <div className="flex justify-between px-5 py-4 border-b">
           <h2 className="text-lg font-semibold">
             {mode === "create" ? "Create Customer" : "Edit Customer"}
           </h2>
@@ -130,42 +152,56 @@ export default function CustomerModal({
           </button>
         </div>
 
-        <div className="p-5 space-y-4 overflow-y-auto">
-          <FormInput label="Company Name" value={form.company} onChange={(v) => update("company", v)} />
-          <FormInput label="Phone" value={form.phone} onChange={(v) => update("phone", v)} />
-          <FormInput label="Location" value={form.location} onChange={(v) => update("location", v)} />
+        {/* ================= FORM ================= */}
+        <div className="p-5 overflow-y-auto space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <FormInput label="Company Name" value={form.company || ""} onChange={(v) => update("company", v)} />
+            <FormInput label="Phone" value={form.phone || ""} onChange={(v) => update("phone", v)} />
+            <FormInput label="Address" value={form.address || ""} onChange={(v) => update("address", v)} />
+            <FormInput label="Location" value={form.location || ""} onChange={(v) => update("location", v)} />
 
-          <FormSelect label="Category" value={form.category} options={CATEGORIES} onChange={(v) => update("category", v)} />
-          <FormSelect label="Payment Mode" value={form.paymentMode} options={PAYMENT_MODES} onChange={(v) => update("paymentMode", v)} />
-          <FormSelect label="Company TRN" value={form.companyTrnNumber} options={TRN_OPTIONS} onChange={(v) => update("companyTrnNumber", v)} />
+            <FormSelect label="State" value={form.state || ""} options={STATES} onChange={(v) => update("state", v)} />
+
+            <FormSelect label="Category" value={form.category || ""} options={CATEGORIES} onChange={handleCategoryChange} />
+
+            <FormSelect
+              label="Payment Mode"
+              value={form.paymentMode || ""}
+              options={PAYMENT_MODES}
+              onChange={(v) => update("paymentMode", v)}
+            />
+
+            <FormSelect
+              label="Company TRN"
+              value={form.companyTrnNumber || ""}
+              options={TRN_OPTIONS}
+              onChange={(v) => update("companyTrnNumber", v)}
+            />
+
+            <FormInput
+              label="Client TRN Number"
+              value={form.clientTrnNumber || ""}
+              onChange={(v) => update("clientTrnNumber", v)}
+            />
+          </div>
 
           {/* ================= EXECUTIVE ================= */}
           <div>
             <label className="text-xs font-medium text-gray-600">Executive</label>
-
             <input
               placeholder="Search executive..."
               onChange={(e) => onExecutiveSearch(e.target.value)}
               className="w-full mt-1 px-3 py-2 border rounded-lg text-sm"
             />
-
             <select
               value={form.executive || ""}
               onChange={(e) => update("executive", e.target.value)}
               className="w-full mt-2 px-3 py-2 border rounded-lg text-sm"
             >
               <option value="">Select Executive</option>
-
-              {/* ✅ BACKEND EXECUTIVE (EDIT MODE) */}
-              {form.executive &&
-                form.executiveName &&
-                !safeExecutives.some((e) => e._id === form.executive) && (
-                  <option value={form.executive}>
-                    {form.executiveName}
-                  </option>
-                )}
-
-              {/* SEARCH RESULTS */}
+              {form.executive && form.executiveName && !safeExecutives.some((e) => e._id === form.executive) && (
+                <option value={form.executive}>{form.executiveName}</option>
+              )}
               {safeExecutives.map((e) => (
                 <option key={e._id} value={e._id}>
                   {e.name} {e.surname || ""}
@@ -176,30 +212,36 @@ export default function CustomerModal({
 
           {/* ================= BARCODE ================= */}
           <div>
-            <label className="text-xs font-medium text-gray-600">
-              Barcodes & Prices
-            </label>
+            <label className="text-xs font-medium text-gray-600">Barcodes & Prices</label>
 
             {items.map((item, i) => (
               <div key={i} className="flex gap-2 mt-2">
                 <select
                   value={item.barCode}
-                  onChange={(e) => update("items", items.map((it, idx) =>
-                    idx === i ? { ...it, barCode: e.target.value } : it
-                  ))}
+                  onChange={(e) =>
+                    update(
+                      "items",
+                      items.map((it, idx) => (idx === i ? { ...it, barCode: e.target.value } : it))
+                    )
+                  }
                   className="flex-1 px-3 py-2 border rounded-lg text-sm"
                 >
                   <option value="">Select Barcode</option>
                   {BARCODE_OPTIONS.map((code) => (
-                    <option key={code} value={code}>{code}</option>
+                    <option key={code} value={code}>
+                      {code}
+                    </option>
                   ))}
                 </select>
 
                 <input
                   value={item.price}
-                  onChange={(e) => update("items", items.map((it, idx) =>
-                    idx === i ? { ...it, price: e.target.value } : it
-                  ))}
+                  onChange={(e) =>
+                    update(
+                      "items",
+                      items.map((it, idx) => (idx === i ? { ...it, price: e.target.value } : it))
+                    )
+                  }
                   placeholder="Price"
                   className="w-24 px-3 py-2 border rounded-lg text-sm"
                 />
@@ -220,13 +262,6 @@ export default function CustomerModal({
               <Plus size={14} /> Add Barcode
             </button>
           </div>
-
-          <FormSelect
-            label="Status"
-            value={form.status || "active"}
-            options={["active", "inactive"]}
-            onChange={(v) => update("status", v)}
-          />
         </div>
 
         <div className="p-4 border-t flex gap-3">
