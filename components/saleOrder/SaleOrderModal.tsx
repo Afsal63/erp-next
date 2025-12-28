@@ -43,6 +43,8 @@ type Client = {
   company: string;
   executive?: Executive;
   items?: CustomerItem[];
+  // ✅ VERY IMPORTANT (FIX)
+  clientTrnNumber: string;
 };
 
 type ItemRow = {
@@ -143,7 +145,12 @@ export default function SaleOrderModal({
 
   const recalcTotals = (rows: ItemRow[]) => {
     const subTotal = rows.reduce((s, r) => s + r.total, 0);
-    const taxRate = Number(form.taxRate || 5);
+
+    // ✅ TAX RULE:
+    // If customer has NO clientTrnNumber → tax = 0
+    const hasClientTRN = Boolean(form.clientTrnNumber);
+
+    const taxRate = hasClientTRN ? Number(form.taxRate || 5) : 0;
     const taxTotal = (subTotal * taxRate) / 100;
 
     setForm((prev: any) => ({
@@ -191,7 +198,7 @@ export default function SaleOrderModal({
       itemName: i.itemName,
       quantity: 0,
       price: customerPrice,
-      total: customerPrice,
+      total: 0,
     }));
 
     recalcTotals([...items, ...rows]);
@@ -259,6 +266,9 @@ export default function SaleOrderModal({
                     ...p,
                     client: c._id,
                     clientName: c.company,
+
+                    // ✅ VERY IMPORTANT (FIX)
+                    clientTrnNumber: c.clientTrnNumber || "",
 
                     // ✅ PRICE SOURCE (SAFE)
                     customerItems: c.items || [],

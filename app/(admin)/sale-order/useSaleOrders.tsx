@@ -28,6 +28,7 @@ type Client = {
   _id: string;
   company: string;
   executive?: Executive;
+  clientTrnNumber?: string;
 };
 
 const useSaleOrders = () => {
@@ -50,8 +51,9 @@ const useSaleOrders = () => {
 
   /* ================= MODAL ================= */
   const [modalOpen, setModalOpen] = useState(false);
-  const [modalMode, setModalMode] =
-    useState<"view" | "edit" | "create">("view");
+  const [modalMode, setModalMode] = useState<"view" | "edit" | "create">(
+    "view"
+  );
 
   const [modalForm, setModalForm] = useState<any>({});
   const [modalId, setModalId] = useState<string | null>(null);
@@ -122,6 +124,7 @@ const useSaleOrders = () => {
     setModalForm({
       client: "",
       clientName: "",
+      clientTrnNumber: "",
       executive: "",
       executiveName: "",
       executiveItems: [], // ✅ SAFE ADD
@@ -153,6 +156,7 @@ const useSaleOrders = () => {
         ...data,
         client: data.client?._id || "",
         clientName: data.client?.company || "",
+        clientTrnNumber: data.client?.clientTrnNumber || "",
         executive: data.executive?._id || "",
         executiveName: data.executive
           ? `${data.executive.name} ${data.executive.surname || ""}`
@@ -187,13 +191,15 @@ const useSaleOrders = () => {
 
       const payload = {
         ...modalForm,
-        items: (modalForm.items || []).map((i: any) => ({
-          barCode: i.barCode,
-          itemName: i.itemName,
-          quantity: Number(i.quantity),
-          price: Number(i.price),
-          total: Number(i.total),
-        })),
+        items: (modalForm.items || [])
+          .filter((i: any) => Number(i.quantity) > 0) // ✅ ONLY QTY > 0
+          .map((i: any) => ({
+            barCode: i.barCode,
+            itemName: i.itemName,
+            quantity: Number(i.quantity),
+            price: Number(i.price),
+            total: Number(i.total),
+          })),
       };
 
       const res =
