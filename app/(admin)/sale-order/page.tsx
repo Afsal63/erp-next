@@ -40,7 +40,6 @@ export default function SaleOrderPage() {
     setDeleting,
     setDeleteId,
     setDeleteName,
-    onBarcodeSelect
   } = useSaleOrders();
 
   if (loading) {

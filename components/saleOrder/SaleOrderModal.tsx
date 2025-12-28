@@ -1,25 +1,45 @@
 "use client";
 
-import { X, Plus, Trash2 } from "lucide-react";
-import { useMemo, useState } from "react";
+import { X, Trash2 } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
 import FormInput from "@/components/ui/FormInput";
 import FormSelect from "@/components/ui/FormSelect";
-import { BARCODE_OPTIONS } from "@/constants/barcodes";
+
+/* ================= FORM SELECT OPTION TYPE ================= */
+
+type Option =
+  | string
+  | {
+      value: string;
+      label: string;
+    };
 
 /* ================= TYPES ================= */
+
+type ExecutiveItem = {
+  _id: string;
+  itemName: string;
+  barCode: string;
+  actualQty: number;
+  price?: number;
+};
+
+type Executive = {
+  _id: string;
+  name: string;
+  surname?: string;
+  items: ExecutiveItem[];
+};
 
 type Client = {
   _id: string;
   company: string;
-  executive?: {
-    _id: string;
-    name: string;
-    surname?: string;
-  };
+  executive?: Executive;
 };
 
 type ItemRow = {
   barCode: string;
+  itemName: string;
   quantity: number;
   price: number;
   total: number;
@@ -41,7 +61,7 @@ type Props = {
 
 /* ================= CONSTANTS ================= */
 
-const STATUS_OPTIONS = ["pending", "accepted", "declined"];
+const STATUS_OPTIONS: Option[] = ["pending", "accepted", "declined"];
 
 /* ================= COMPONENT ================= */
 
@@ -56,19 +76,57 @@ export default function SaleOrderModal({
   customers,
   onCustomerSearch,
 }: Props) {
-  if (!open) return null;
+  /* ================= STATE ================= */
 
   const items: ItemRow[] = Array.isArray(form.items) ? form.items : [];
   const [selectedBarcode, setSelectedBarcode] = useState("");
+  const [loadingCustomers, setLoadingCustomers] = useState(false);
+
+  /* ================= EFFECTS ================= */
+
+  useEffect(() => {
+    setLoadingCustomers(false);
+  }, [customers]);
+
+  // ✅ AUTO SET EXECUTIVE WHEN CUSTOMER CHANGES (TS SAFE)
+  useEffect(() => {
+    if (!form.client) return;
+
+    const c = customers.find((x) => x._id === form.client);
+    if (!c?.executive) return;
+
+    const exec = c.executive; // 🔒 REQUIRED FOR TS
+
+    setForm((p: any) => ({
+      ...p,
+      executive: exec._id,
+      executiveName: `${exec.name} ${exec.surname || ""}`,
+      executiveItems: exec.items,
+    }));
+  }, [form.client, customers, setForm]);
 
   /* ================= DERIVED ================= */
 
-  // 🔑 unique barcode tags (same logic as Employee)
+  const barcodeOptions: Option[] = useMemo(() => {
+    if (!Array.isArray(form.executiveItems)) return [];
+
+    const codes: string[] = form.executiveItems.map((i: ExecutiveItem) =>
+      String(i.barCode)
+    );
+
+    const uniqueCodes = Array.from(new Set(codes));
+
+    return uniqueCodes.map((code) => ({
+      value: code,
+      label: `Barcode ${code}`,
+    }));
+  }, [form.executiveItems]);
+
   const selectedBarcodes = useMemo(() => {
-    const set = new Set<string>();
-    items.forEach((i) => i.barCode && set.add(i.barCode));
-    return Array.from(set);
+    return [...new Set(items.map((i) => i.barCode))];
   }, [items]);
+
+  if (!open) return null;
 
   /* ================= HELPERS ================= */
 
@@ -95,9 +153,7 @@ export default function SaleOrderModal({
         ? {
             ...it,
             ...patch,
-            total:
-              (patch.quantity ?? it.quantity) *
-              (patch.price ?? it.price),
+            total: (patch.quantity ?? it.quantity) * (patch.price ?? it.price),
           }
         : it
     );
@@ -106,16 +162,23 @@ export default function SaleOrderModal({
 
   /* ================= BARCODE HANDLERS ================= */
 
-  // ➕ Add new row when barcode selected
   const handleBarcodeSelect = (barCode: string) => {
     setSelectedBarcode("");
-    recalcTotals([
-      ...items,
-      { barCode, quantity: 1, price: 0, total: 0 },
-    ]);
+
+    const related =
+      form.executiveItems?.filter((i: any) => i.barCode === barCode) || [];
+
+    const rows: ItemRow[] = related.map((i: any) => ({
+      barCode: i.barCode,
+      itemName: i.itemName,
+      quantity: 1,
+      price: Number(i.price || 0),
+      total: Number(i.price || 0),
+    }));
+
+    recalcTotals([...items, ...rows]);
   };
 
-  // ❌ Remove ALL rows of that barcode
   const removeBarcode = (barCode: string) => {
     recalcTotals(items.filter((i) => i.barCode !== barCode));
   };
@@ -125,7 +188,7 @@ export default function SaleOrderModal({
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-4">
       <div className="w-full max-w-5xl bg-white rounded-2xl shadow-lg max-h-[90vh] flex flex-col">
-        {/* ================= HEADER ================= */}
+        {/* HEADER */}
         <div className="flex justify-between items-center px-6 py-4 border-b">
           <h2 className="text-lg font-semibold">
             {mode === "create" ? "Save Sale Order" : "Edit Sale Order"}
@@ -144,36 +207,58 @@ export default function SaleOrderModal({
           </div>
         </div>
 
-        {/* ================= BODY ================= */}
+        {/* BODY */}
         <div className="p-6 overflow-y-auto space-y-6">
-          {/* ================= CUSTOMER / STATUS ================= */}
+          {/* CUSTOMER */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="text-xs font-medium text-gray-600">
                 Customer *
               </label>
+
               <input
                 placeholder="Search Here"
-                onChange={(e) => onCustomerSearch(e.target.value)}
+                onChange={(e) => {
+                  setLoadingCustomers(true);
+                  onCustomerSearch(e.target.value);
+                }}
                 className="w-full mt-1 px-3 py-2 border rounded-lg"
               />
+
               <select
+                className="w-full mt-2 px-3 py-2 border rounded-lg"
                 value={form.client || ""}
+                disabled={loadingCustomers}
                 onChange={(e) => {
                   const c = customers.find((x) => x._id === e.target.value);
+
+                  if (!c?.executive) {
+                    setForm((p: any) => ({
+                      ...p,
+                      client: c?._id || "",
+                      clientName: c?.company || "",
+                      executive: "",
+                      executiveName: "",
+                      executiveItems: [],
+                      items: [],
+                    }));
+                    return;
+                  }
+
+                  const exec = c.executive;
+
                   setForm((p: any) => ({
                     ...p,
-                    client: c?._id || "",
-                    clientName: c?.company || "",
-                    executive: c?.executive?._id || "",
-                    executiveName: c?.executive
-                      ? `${c.executive.name} ${c.executive.surname || ""}`
-                      : "",
+                    client: c._id,
+                    clientName: c.company,
+                    executive: exec._id,
+                    executiveName: `${exec.name} ${exec.surname || ""}`,
+                    executiveItems: exec.items,
+                    items: [],
                   }));
                 }}
-                className="w-full mt-2 px-3 py-2 border rounded-lg"
               >
-                <option value="">Select Customer</option>
+                <option value="">Select customer</option>
                 {customers.map((c) => (
                   <option key={c._id} value={c._id}>
                     {c.company}
@@ -185,8 +270,8 @@ export default function SaleOrderModal({
             <FormInput
               label="Executive"
               value={form.executiveName || ""}
-              onChange={() => {}}
               disabled
+              onChange={() => {}}
             />
 
             <FormSelect
@@ -212,69 +297,60 @@ export default function SaleOrderModal({
             />
           </div>
 
-          {/* ================= BARCODE SELECT ================= */}
+          {/* BARCODE */}
           <FormSelect
             label="Add Barcode"
             value={selectedBarcode}
-            options={BARCODE_OPTIONS}
+            options={barcodeOptions}
+            disabled={!form.client}
             onChange={handleBarcodeSelect}
           />
 
-          {/* ================= BARCODE TAGS ================= */}
-          {selectedBarcodes.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {selectedBarcodes.map((code) => (
-                <span
-                  key={code}
-                  className="flex items-center gap-1 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium"
-                >
-                  {code}
-                  <button
-                    onClick={() => removeBarcode(code)}
-                    className="hover:text-red-600"
-                  >
-                    <X size={12} />
-                  </button>
-                </span>
-              ))}
-            </div>
-          )}
+          {/* TAGS */}
+          <div className="flex flex-wrap gap-2">
+            {selectedBarcodes.map((code) => (
+              <span
+                key={code}
+                className="px-3 py-1 bg-blue-100 rounded-full text-xs flex gap-1"
+              >
+                {code}
+                <button onClick={() => removeBarcode(code)}>
+                  <X size={12} />
+                </button>
+              </span>
+            ))}
+          </div>
 
-          {/* ================= ITEMS ================= */}
+          {/* ITEMS */}
           {items.map((item, idx) => (
-            <div
-              key={idx}
-              className="grid grid-cols-4 gap-2 items-center mb-2"
-            >
+            <div key={idx} className="grid grid-cols-4 gap-2">
               <FormInput
                 label="Item"
-                value={item.barCode}
-                onChange={(v) => updateItem(idx, { barCode: v })}
+                value={item.itemName}
+                disabled
+                onChange={() => {}}
               />
               <FormInput
                 label="Qty"
                 value={String(item.quantity)}
-                onChange={(v) =>
-                  updateItem(idx, { quantity: Number(v) })
-                }
+                onChange={(v) => updateItem(idx, { quantity: Number(v) })}
               />
               <FormInput
                 label="Rate"
                 value={String(item.price)}
                 onChange={(v) => updateItem(idx, { price: Number(v) })}
               />
-              <div className="flex items-center gap-2">
+              <div className="flex gap-2">
                 <FormInput
                   label="Total"
                   value={String(item.total)}
-                  onChange={() => {}}
                   disabled
+                  onChange={() => {}}
                 />
                 <button
                   onClick={() =>
                     recalcTotals(items.filter((_, i) => i !== idx))
                   }
-                  className="text-gray-500"
                 >
                   <Trash2 size={16} />
                 </button>

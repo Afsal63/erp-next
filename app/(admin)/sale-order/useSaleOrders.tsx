@@ -4,9 +4,31 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import SaleOrderService from "@/services/SaleOrderService";
 import CustomersService from "@/services/CustomersService";
-import InventoryItemService from "@/services/InventoryItemService";
 
 const ITEMS_PER_PAGE = 10;
+
+/* ================= TYPES (ADDED ONLY) ================= */
+
+type ExecutiveItem = {
+  _id: string;
+  itemName: string;
+  barCode: string;
+  actualQty: number;
+  price?: number;
+};
+
+type Executive = {
+  _id: string;
+  name: string;
+  surname?: string;
+  items: ExecutiveItem[]; // ✅ THIS WAS MISSING
+};
+
+type Client = {
+  _id: string;
+  company: string;
+  executive?: Executive;
+};
 
 const useSaleOrders = () => {
   /* ================= LIST ================= */
@@ -18,7 +40,7 @@ const useSaleOrders = () => {
   const [search, setSearch] = useState("");
 
   /* ================= CUSTOMER SEARCH ================= */
-  const [customers, setCustomers] = useState<any[]>([]);
+  const [customers, setCustomers] = useState<Client[]>([]); // ✅ FIXED
   const [customerSearch, setCustomerSearch] = useState("");
 
   /* ================= DELETE ================= */
@@ -92,47 +114,6 @@ const useSaleOrders = () => {
     return () => clearTimeout(delay);
   }, [customerSearch]);
 
-  /* ================= BARCODE SELECT (LIKE EMPLOYEE) ================= */
-  const onBarcodeSelect = async (barCode: string) => {
-    try {
-      const res = await InventoryItemService.listByBarcode(barCode, 1, 100, "");
-      if (!res?.success) return;
-
-      setModalForm((prev: any) => {
-        const existing = prev.items || [];
-
-        // unique key = barCode + itemName
-        const existingKeySet = new Set(
-          existing.map((i: any) => `${i.barCode}__${i.itemName}`)
-        );
-
-        const newItems = res.result
-          .filter(
-            (inv: any) =>
-              !existingKeySet.has(`${inv.barCode}__${inv.itemName}`)
-          )
-          .map((inv: any) => ({
-            _id: inv._id,
-            barCode: inv.barCode,
-            itemName: inv.itemName,
-
-            quantity: 1,
-            price: Number(inv.price || 0),
-            total: Number(inv.price || 0),
-          }));
-
-        if (newItems.length === 0) return prev;
-
-        return {
-          ...prev,
-          items: [...existing, ...newItems],
-        };
-      });
-    } catch {
-      toast.error("Failed to load inventory items");
-    }
-  };
-
   /* ================= MODALS ================= */
   const openCreateModal = () => {
     setModalMode("create");
@@ -143,6 +124,7 @@ const useSaleOrders = () => {
       clientName: "",
       executive: "",
       executiveName: "",
+      executiveItems: [], // ✅ SAFE ADD
       date: new Date().toISOString().slice(0, 10),
       note: "",
       status: "pending",
@@ -175,6 +157,7 @@ const useSaleOrders = () => {
         executiveName: data.executive
           ? `${data.executive.name} ${data.executive.surname || ""}`
           : "",
+        executiveItems: data.executive?.items || [], // ✅ SAFE ADD
         items: (data.items || []).map((i: any) => ({
           _id: i._id,
           barCode: i.barCode,
@@ -258,8 +241,6 @@ const useSaleOrders = () => {
     openCreateModal,
     openItemModal,
     saveOrder,
-
-    onBarcodeSelect,
 
     deleteId,
     deleteName,

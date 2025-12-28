@@ -211,7 +211,7 @@ export default function CustomerModal({
             />
             <FormInput
               label="Customer Discount"
-              value={form.clientTrnNumber || ""}
+              value={form.customerDiscount || ""}
               onChange={(v) => update("customerDiscount", v)}
             />
           </div>
