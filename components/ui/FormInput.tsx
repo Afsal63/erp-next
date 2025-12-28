@@ -6,6 +6,7 @@ type FormInputProps = {
   onChange: (v: string) => void;
   disabled?: boolean;
   placeholder?: string;
+  type?: "text" | "number" | "date" | "email" | "tel";
 };
 
 export default function FormInput({
@@ -14,13 +15,16 @@ export default function FormInput({
   onChange,
   disabled = false,
   placeholder = "",
+  type = "text", // ✅ default stays text
 }: FormInputProps) {
   return (
     <div>
       <label className="text-xs font-medium text-gray-600">
         {label}
       </label>
+
       <input
+        type={type}                
         value={value}
         disabled={disabled}
         placeholder={placeholder}

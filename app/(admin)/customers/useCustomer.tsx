@@ -175,6 +175,7 @@ const useCustomers = () => {
       category: "",
       paymentMode: "",
       companyTrnNumber: "",
+      customerDiscount: "",
       clientTrnNumber: "",
       registrationType: "",
       state: "",
@@ -187,59 +188,60 @@ const useCustomers = () => {
 
   /* ================= SAVE ================= */
   const saveCustomer = async () => {
-  try {
-    setModalLoading(true);
+    try {
+      setModalLoading(true);
 
-    const payload = {
-      company: modalForm.company?.trim(),
-      phone: modalForm.phone?.trim(),
-      address: modalForm.address || "",
-      location: modalForm.location || "",
-      category: modalForm.category,
-      paymentMode: modalForm.paymentMode,
-      companyTrnNumber: modalForm.companyTrnNumber,
-      clientTrnNumber: modalForm.clientTrnNumber,
-      state: modalForm.state,
-      country: "UAE",
+      const payload = {
+        company: modalForm.company?.trim(),
+        phone: modalForm.phone?.trim(),
+        address: modalForm.address || "",
+        location: modalForm.location || "",
+        category: modalForm.category,
+        paymentMode: modalForm.paymentMode,
+        companyTrnNumber: modalForm.companyTrnNumber,
+        clientTrnNumber: modalForm.clientTrnNumber,
+        customerDiscount:modalForm.customerDiscount,
+        state: modalForm.state,
+        country: "UAE",
 
-      executive:
-        typeof modalForm.executive === "object"
-          ? modalForm.executive._id
-          : modalForm.executive,
+        executive:
+          typeof modalForm.executive === "object"
+            ? modalForm.executive._id
+            : modalForm.executive,
 
-      // ✅ IMPORTANT FIX
-      items: (modalForm.items || []).map((i: any) => ({
-        barCode: i.barCode,      // ✅ REQUIRED BY BACKEND
-        price: Number(i.price),
-      })),
-    };
+        // ✅ IMPORTANT FIX
+        items: (modalForm.items || []).map((i: any) => ({
+          barCode: i.barCode, // ✅ REQUIRED BY BACKEND
+          price: Number(i.price),
+        })),
+      };
 
-    if (!payload.company || !payload.phone || !payload.executive) {
-      toast.error("Company, Phone and Executive are required");
-      return;
+      if (!payload.company || !payload.phone || !payload.executive) {
+        toast.error("Company, Phone and Executive are required");
+        return;
+      }
+
+      const res =
+        modalMode === "create"
+          ? await CustomersService.create(payload)
+          : await CustomersService.updateItem(modalId!, payload);
+
+      if (!res?.success) throw new Error(res?.message);
+
+      toast.success(
+        modalMode === "create"
+          ? "Customer created successfully"
+          : "Customer updated successfully"
+      );
+
+      setModalOpen(false);
+      fetchCustomers();
+    } catch (err: any) {
+      toast.error(err?.message || "Save failed");
+    } finally {
+      setModalLoading(false);
     }
-
-    const res =
-      modalMode === "create"
-        ? await CustomersService.create(payload)
-        : await CustomersService.updateItem(modalId!, payload);
-
-    if (!res?.success) throw new Error(res?.message);
-
-    toast.success(
-      modalMode === "create"
-        ? "Customer created successfully"
-        : "Customer updated successfully"
-    );
-
-    setModalOpen(false);
-    fetchCustomers();
-  } catch (err: any) {
-    toast.error(err?.message || "Save failed");
-  } finally {
-    setModalLoading(false);
-  }
-};
+  };
 
   /* ================= DELETE ================= */
   const deleteItem = async (id: string) => {

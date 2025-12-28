@@ -155,14 +155,40 @@ export default function CustomerModal({
         {/* ================= FORM ================= */}
         <div className="p-5 overflow-y-auto space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <FormInput label="Company Name" value={form.company || ""} onChange={(v) => update("company", v)} />
-            <FormInput label="Phone" value={form.phone || ""} onChange={(v) => update("phone", v)} />
-            <FormInput label="Address" value={form.address || ""} onChange={(v) => update("address", v)} />
-            <FormInput label="Location" value={form.location || ""} onChange={(v) => update("location", v)} />
+            <FormInput
+              label="Company Name"
+              value={form.company || ""}
+              onChange={(v) => update("company", v)}
+            />
+            <FormInput
+              label="Phone"
+              value={form.phone || ""}
+              onChange={(v) => update("phone", v)}
+            />
+            <FormInput
+              label="Address"
+              value={form.address || ""}
+              onChange={(v) => update("address", v)}
+            />
+            <FormInput
+              label="Location"
+              value={form.location || ""}
+              onChange={(v) => update("location", v)}
+            />
 
-            <FormSelect label="State" value={form.state || ""} options={STATES} onChange={(v) => update("state", v)} />
+            <FormSelect
+              label="State"
+              value={form.state || ""}
+              options={STATES}
+              onChange={(v) => update("state", v)}
+            />
 
-            <FormSelect label="Category" value={form.category || ""} options={CATEGORIES} onChange={handleCategoryChange} />
+            <FormSelect
+              label="Category"
+              value={form.category || ""}
+              options={CATEGORIES}
+              onChange={handleCategoryChange}
+            />
 
             <FormSelect
               label="Payment Mode"
@@ -183,11 +209,18 @@ export default function CustomerModal({
               value={form.clientTrnNumber || ""}
               onChange={(v) => update("clientTrnNumber", v)}
             />
+            <FormInput
+              label="Customer Discount"
+              value={form.clientTrnNumber || ""}
+              onChange={(v) => update("customerDiscount", v)}
+            />
           </div>
 
           {/* ================= EXECUTIVE ================= */}
           <div>
-            <label className="text-xs font-medium text-gray-600">Executive</label>
+            <label className="text-xs font-medium text-gray-600">
+              Executive
+            </label>
             <input
               placeholder="Search executive..."
               onChange={(e) => onExecutiveSearch(e.target.value)}
@@ -199,9 +232,11 @@ export default function CustomerModal({
               className="w-full mt-2 px-3 py-2 border rounded-lg text-sm"
             >
               <option value="">Select Executive</option>
-              {form.executive && form.executiveName && !safeExecutives.some((e) => e._id === form.executive) && (
-                <option value={form.executive}>{form.executiveName}</option>
-              )}
+              {form.executive &&
+                form.executiveName &&
+                !safeExecutives.some((e) => e._id === form.executive) && (
+                  <option value={form.executive}>{form.executiveName}</option>
+                )}
               {safeExecutives.map((e) => (
                 <option key={e._id} value={e._id}>
                   {e.name} {e.surname || ""}
@@ -212,7 +247,9 @@ export default function CustomerModal({
 
           {/* ================= BARCODE ================= */}
           <div>
-            <label className="text-xs font-medium text-gray-600">Barcodes & Prices</label>
+            <label className="text-xs font-medium text-gray-600">
+              Barcodes & Prices
+            </label>
 
             {items.map((item, i) => (
               <div key={i} className="flex gap-2 mt-2">
@@ -221,7 +258,9 @@ export default function CustomerModal({
                   onChange={(e) =>
                     update(
                       "items",
-                      items.map((it, idx) => (idx === i ? { ...it, barCode: e.target.value } : it))
+                      items.map((it, idx) =>
+                        idx === i ? { ...it, barCode: e.target.value } : it
+                      )
                     )
                   }
                   className="flex-1 px-3 py-2 border rounded-lg text-sm"
@@ -239,7 +278,9 @@ export default function CustomerModal({
                   onChange={(e) =>
                     update(
                       "items",
-                      items.map((it, idx) => (idx === i ? { ...it, price: e.target.value } : it))
+                      items.map((it, idx) =>
+                        idx === i ? { ...it, price: e.target.value } : it
+                      )
                     )
                   }
                   placeholder="Price"
@@ -247,7 +288,12 @@ export default function CustomerModal({
                 />
 
                 <button
-                  onClick={() => update("items", items.filter((_, idx) => idx !== i))}
+                  onClick={() =>
+                    update(
+                      "items",
+                      items.filter((_, idx) => idx !== i)
+                    )
+                  }
                   className="p-2 bg-red-50 text-red-600 rounded-lg"
                 >
                   <Trash2 size={16} />
@@ -256,7 +302,9 @@ export default function CustomerModal({
             ))}
 
             <button
-              onClick={() => update("items", [...items, { barCode: "", price: "" }])}
+              onClick={() =>
+                update("items", [...items, { barCode: "", price: "" }])
+              }
               className="mt-3 text-sm text-blue-600 flex items-center gap-2"
             >
               <Plus size={14} /> Add Barcode

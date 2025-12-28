@@ -4,6 +4,9 @@ import useSaleOrders from "./useSaleOrders";
 import Pagination from "@/components/ui/Pagination";
 import SearchInput from "@/components/ui/SearchInput";
 import ActionDropdown from "@/components/ui/ActionDropdown";
+import ConfirmModal from "@/components/ui/ConfirmModal";
+import SaleOrderModal from "@/components/saleOrder/SaleOrderModal";
+import { Plus } from "lucide-react";
 
 export default function SaleOrderPage() {
   const {
@@ -13,19 +16,62 @@ export default function SaleOrderPage() {
     pagination,
     setPage,
     handleSearch,
+
+    // ✅ modal
+    openCreateModal,
+    openItemModal,
+    modalOpen,
+    modalMode,
+    modalForm,
+    modalLoading,
+    saveOrder,
+    setModalForm,
+    setModalOpen,
+
+    // ✅ REQUIRED FOR MODAL
+    customers,
+    setCustomerSearch,
+
+    // ✅ delete
+    deleteId,
+    deleteName,
+    deleting,
+    deleteItem,
+    setDeleting,
+    setDeleteId,
+    setDeleteName,
+    onBarcodeSelect
   } = useSaleOrders();
 
   if (loading) {
-    return <div className="p-6 text-sm text-gray-500">Loading sale orders...</div>;
+    return (
+      <div className="p-6 text-sm text-gray-500">Loading sale orders...</div>
+    );
   }
 
   return (
     <div className="p-6 space-y-6">
       <h1 className="text-2xl font-bold">Sale Orders</h1>
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <SearchInput
+          onSearch={handleSearch}
+          placeholder="Search Sale Orders..."
+        />
 
-      <SearchInput onSearch={handleSearch} placeholder="Search Sale Orders..." />
+        <button
+          onClick={openCreateModal}
+          className="
+            flex items-center gap-2 px-4 py-2 rounded-lg
+            bg-blue-600 text-white
+            hover:bg-blue-700 transition
+          "
+        >
+          <Plus size={16} />
+          Create SaleOrder
+        </button>
+      </div>
 
-      <div className="bg-white border rounded-2xl shadow-sm overflow-hidden">
+      <div className="bg-white border rounded-2xl shadow-sm overflow-visible">
         <table className="w-full text-sm">
           <thead className="bg-gray-50">
             <tr>
@@ -44,17 +90,20 @@ export default function SaleOrderPage() {
                 <td className="p-4">{o.client?.company || "-"}</td>
                 <td className="p-4">
                   {o.client?.executive
-                    ? `${o.client.executive.name} ${o.client.executive.surname || ""}`
+                    ? `${o.client.executive.name} ${
+                        o.client.executive.surname || ""
+                      }`
                     : "-"}
                 </td>
-                <td className="p-4">
-                  {new Date(o.date).toLocaleDateString()}
-                </td>
+                <td className="p-4">{new Date(o.date).toLocaleDateString()}</td>
                 <td className="p-4 text-center">
                   <ActionDropdown
                     onShow={() => {}}
                     onEdit={() => {}}
-                    onDelete={() => {}}
+                    onDelete={() => {
+                      setDeleteId(o._id);
+                      setDeleteName(o.number);
+                    }}
                   />
                 </td>
               </tr>
@@ -68,6 +117,42 @@ export default function SaleOrderPage() {
           </div>
         )}
       </div>
+      {/* ================= SALE ORDER MODAL ================= */}
+    <SaleOrderModal
+  open={modalOpen}
+  mode={modalMode}
+  loading={modalLoading}
+  form={modalForm}
+  setForm={setModalForm}
+  onClose={() => setModalOpen(false)}
+  onSave={saveOrder}
+  customers={customers}
+  onCustomerSearch={setCustomerSearch}
+/>
+
+      {/* ================= DELETE CONFIRM ================= */}
+
+      <ConfirmModal
+        open={!!deleteId}
+        title="Delete Customer"
+        message={`Are you sure you want to delete "${deleteName}"?`}
+        loading={deleting}
+        onCancel={() => {
+          setDeleteId(null);
+          setDeleteName("");
+        }}
+        onConfirm={async () => {
+          if (!deleteId) return;
+          try {
+            setDeleting(true);
+            await deleteItem(deleteId);
+          } finally {
+            setDeleting(false);
+            setDeleteId(null);
+            setDeleteName("");
+          }
+        }}
+      />
 
       <Pagination
         page={page}
