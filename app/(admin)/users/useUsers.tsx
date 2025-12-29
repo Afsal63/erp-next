@@ -39,6 +39,10 @@ const useUsers = () => {
   );
   const [selectedUser, setSelectedUser] = useState<any>(null);
 
+    /* ================= CREATE MODAL ================= */
+  const [createOpen, setCreateOpen] = useState(false);
+  const [createLoading, setCreateLoading] = useState(false);
+
   const fetchUsers = async (
     pageNo: number = page,
     searchValue: string = search
@@ -74,6 +78,19 @@ const useUsers = () => {
     setPage(1);
     fetchUsers(1, value.trim());
   };
+
+  const createUser = async (payload: any) => {
+  const toastId = toast.loading("Creating user...");
+  try {
+    const res = await UsersService.create(payload);
+    if (!res?.success) throw new Error(res?.message);
+
+    toast.success("User created successfully", { id: toastId });
+    fetchUsers(); // refresh list
+  } catch (err: any) {
+    toast.error(err?.message || "Failed to create user", { id: toastId });
+  }
+};
 
   const updatePassword = async (userId: string, payload: any) => {
   const toastId = toast.loading("Updating password...");
@@ -146,7 +163,12 @@ const updateRole = async (userId: string, payload: any) => {
     selectedUser,
     setSelectedUser,
     updatePassword,
-    updateRole
+    updateRole,
+    createOpen,
+    setCreateOpen,
+    createLoading,
+    setCreateLoading,
+  createUser
   };
 };
 

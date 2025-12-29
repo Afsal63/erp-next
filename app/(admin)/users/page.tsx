@@ -6,9 +6,12 @@ import Pagination from "@/components/ui/Pagination";
 import UserDropdown from "@/components/user/UserDropDown";
 import UserActionModal from "@/components/user/UserActionModal";
 import ConfirmModal from "@/components/ui/ConfirmModal";
+import { Plus } from "lucide-react";
+import CreateUserModal from "@/components/user/CreateUserModal";
 
 export default function UsersPage() {
   const {
+    createUser,
     users,
     loading,
     page,
@@ -23,6 +26,10 @@ export default function UsersPage() {
     setActionMode,
     updatePassword,
     updateRole,
+    createOpen,
+    setCreateOpen,
+    createLoading,
+    setCreateLoading,
     deleteId,
     deleteItem,
     setDeleteId,
@@ -46,8 +53,18 @@ export default function UsersPage() {
         </p>
       </div>
 
-      {/* ================= SEARCH ================= */}
-      <SearchInput onSearch={handleSearch} placeholder="Search users..." />
+      {/* ================= SEARCH/ Create Button ================= */}
+
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <SearchInput onSearch={handleSearch} placeholder="Search users..." />
+        <button
+          onClick={() => setCreateOpen(true)}
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+        >
+          <Plus size={16} />
+          Create User
+        </button>
+      </div>
 
       {/* ================= TABLE ================= */}
       <div className="hidden md:block bg-white border rounded-2xl shadow-sm overflow-visible">
@@ -224,6 +241,25 @@ export default function UsersPage() {
           }
         }}
       />
+
+
+      {/* ================= CREATE MODAL ================= */}
+      <CreateUserModal
+        open={createOpen}
+        loading={createLoading}
+        onClose={() => setCreateOpen(false)}
+        onSubmit={async (payload) => {
+          try {
+            setCreateLoading(true);
+            await createUser(payload);
+            setCreateOpen(false);
+          } finally {
+            setCreateLoading(false);
+          }
+        }}
+      />
+
+
       {/* ================= Delete ================= */}
 
       <ConfirmModal
