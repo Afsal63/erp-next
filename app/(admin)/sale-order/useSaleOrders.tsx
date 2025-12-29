@@ -56,8 +56,13 @@ const useSaleOrders = () => {
           )
         : await SaleOrderService.list(pageNo, ITEMS_PER_PAGE);
 
-      setOrders(res?.success ? res.result : []);
-      setPagination(res?.pagination || null);
+if (res?.success) {
+  setOrders(res.result || []);
+  setPagination(res.pagination || null);
+} else {
+  setOrders([]);
+  setPagination(null);
+}
     } catch {
       toast.error("Failed to load sale orders");
     } finally {

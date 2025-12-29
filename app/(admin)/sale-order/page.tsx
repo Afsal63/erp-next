@@ -70,7 +70,7 @@ export default function SaleOrderPage() {
         </button>
       </div>
 
-      <div className="bg-white border rounded-2xl shadow-sm overflow-visible">
+      <div className="bg-white border rounded-2xl shadow-sm overflow-visible hidden md:block">
         <table className="w-full text-sm">
           <thead className="bg-gray-50">
             <tr>
@@ -95,7 +95,7 @@ export default function SaleOrderPage() {
                     : "-"}
                 </td>
                 <td className="p-4">{new Date(o.date).toLocaleDateString()}</td>
-                <td className="p-4 text-center">
+                <td className="p-4 text-end">
                   <ActionDropdown
                     onShow={() => {}}
                     onEdit={() => openItemModal(o._id, "edit")}
@@ -116,6 +116,47 @@ export default function SaleOrderPage() {
           </div>
         )}
       </div>
+
+    
+{/* MOBILE VIEW */}
+<div className="md:hidden space-y-4">
+  {(orders ?? []).map((o) => (
+    <div
+      key={o._id}
+      className="border rounded-xl p-4 bg-white shadow-sm space-y-3"
+    >
+      {/* Order Info */}
+      <div className="font-semibold text-base">{o.number}</div>
+
+      <div className="text-sm text-gray-600">
+        Client: {o.client?.company || "-"}
+      </div>
+
+      <div className="text-sm">
+        Executive:{" "}
+        {o.client?.executive
+          ? `${o.client.executive.name} ${o.client.executive.surname || ""}`
+          : "-"}
+      </div>
+
+      <div className="text-sm">
+        Date: {new Date(o.date).toLocaleDateString()}
+      </div>
+
+      {/* ACTION BAR */}
+      <div className="pt-3 border-t flex justify-end relative">
+        <ActionDropdown
+          onShow={() => {}}
+          onEdit={() => openItemModal(o._id, "edit")}
+          onDelete={() => {
+            setDeleteId(o._id);
+            setDeleteName(o.number);
+          }}
+        />
+      </div>
+    </div>
+  ))}
+</div>
       {/* ================= SALE ORDER MODAL ================= */}
       <SaleOrderModal
         open={modalOpen}

@@ -78,7 +78,7 @@ const useCustomers = () => {
   /* ================= PAGINATION ================= */
   useEffect(() => {
     fetchCustomers(page, search);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [page]);
 
   /* ================= SEARCH ================= */
