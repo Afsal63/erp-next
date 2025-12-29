@@ -20,6 +20,8 @@ export default function UsersPage() {
     selectedUser,
     setSelectedUser,
     setActionMode,
+    updatePassword,
+    updateRole
   } = useUsers();
 
   if (loading) {
@@ -185,9 +187,16 @@ export default function UsersPage() {
           setSelectedUser(null);
         }}
         onSubmit={(data) => {
-          console.log("SUBMIT DATA", data);
-          // call update role / password API here
-        }}
+    if (!selectedUser) return;
+
+    if (actionMode === "password") {
+      updatePassword(selectedUser._id, data);
+    }
+
+    if (actionMode === "role") {
+      updateRole(selectedUser._id, data);
+    }
+  }}
       />
 
       {/* ================= PAGINATION ================= */}

@@ -70,6 +70,33 @@ const useUsers = () => {
     fetchUsers(1, value.trim());
   };
 
+  const updatePassword = async (userId: string, payload: any) => {
+  const toastId = toast.loading("Updating password...");
+  try {
+    const res = await UsersService.passwordUpdate(userId, payload);
+    if (!res?.success) throw new Error(res?.message);
+
+    toast.success("Password updated successfully", { id: toastId });
+    setActionOpen(false);
+  } catch (err: any) {
+    toast.error(err?.message || "Password update failed", { id: toastId });
+  }
+};
+
+const updateRole = async (userId: string, payload: any) => {
+  const toastId = toast.loading("Updating role...");
+  try {
+    const res = await UsersService.updateRole(userId, payload);
+    if (!res?.success) throw new Error(res?.message);
+
+    toast.success("Role updated successfully", { id: toastId });
+    setActionOpen(false);
+    fetchUsers(); // refresh list
+  } catch (err: any) {
+    toast.error(err?.message || "Role update failed", { id: toastId });
+  }
+};
+
   return {
     users,
     loading,
@@ -83,7 +110,9 @@ const useUsers = () => {
     actionMode,
     setActionMode,
     selectedUser,
-    setSelectedUser
+    setSelectedUser,
+    updatePassword,
+    updateRole
   };
 };
 

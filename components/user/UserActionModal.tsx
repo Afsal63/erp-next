@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { X } from "lucide-react";
 
 type Mode = "view" | "role" | "password";
@@ -35,6 +36,52 @@ export default function UserActionModal({
 }: Props) {
   if (!open || !user) return null;
 
+  /* ================= LOCAL STATE ================= */
+  const [role, setRole] = useState(user.role);
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+
+  /* ================= SUBMIT HANDLER ================= */
+  const handleSave = () => {
+  if (mode === "role") {
+  onSubmit?.({
+    name: user.name,
+    surname: user.surname,
+    email: user.email,
+    role,
+  });
+  return;
+}
+
+    if (mode === "password") {
+      // REQUIRED
+      if (!password || !confirmPassword) {
+        setError("Both fields are required");
+        return;
+      }
+
+      // MIN LENGTH
+      if (password.length < 8) {
+        setError("Password must be at least 8 characters");
+        return;
+      }
+
+      // MATCH CHECK
+      if (password !== confirmPassword) {
+        setError("Passwords do not match");
+        return;
+      }
+
+      setError("");
+      onSubmit?.({
+        email: user.email,
+        password,
+        conformPassword: confirmPassword,
+      });
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 bg-black/40 flex items-end md:items-center md:justify-center">
       <div className="w-full md:max-w-lg bg-white rounded-t-2xl md:rounded-2xl shadow-lg">
@@ -67,10 +114,8 @@ export default function UserActionModal({
           {/* ===== UPDATE ROLE ===== */}
           {mode === "role" && (
             <select
-              defaultValue={user.role}
-              onChange={(e) =>
-                onSubmit?.({ role: e.target.value })
-              }
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
               className="w-full px-3 py-2 border rounded-lg text-sm"
             >
               <option value="admin">Admin</option>
@@ -86,10 +131,27 @@ export default function UserActionModal({
                 type="password"
                 placeholder="New Password"
                 className="w-full px-3 py-2 border rounded-lg text-sm"
-                onChange={(e) =>
-                  onSubmit?.({ password: e.target.value })
-                }
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
+
+              <input
+                type="password"
+                placeholder="Confirm Password"
+                className="w-full px-3 py-2 border rounded-lg text-sm"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+
+              {/* HELPER TEXT */}
+              <p className="text-xs text-gray-500">
+                Password must be at least 8 characters
+              </p>
+
+              {/* ERROR */}
+              {error && (
+                <p className="text-xs text-red-600">{error}</p>
+              )}
             </div>
           )}
         </div>
@@ -105,7 +167,7 @@ export default function UserActionModal({
             </button>
             <button
               disabled={loading}
-              onClick={() => {}}
+              onClick={handleSave}
               className="flex-1 bg-blue-600 text-white rounded-lg py-2 disabled:opacity-60"
             >
               {loading ? "Saving..." : "Save"}
