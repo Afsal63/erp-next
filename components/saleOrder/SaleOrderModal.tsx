@@ -4,6 +4,7 @@ import { X, Trash2 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import FormInput from "@/components/ui/FormInput";
 import FormSelect from "@/components/ui/FormSelect";
+import { Client, ExecutiveItem } from "@/types/client";
 
 /* ================= FORM SELECT OPTION TYPE ================= */
 
@@ -16,20 +17,9 @@ type Option =
 
 /* ================= TYPES ================= */
 
-type ExecutiveItem = {
-  _id: string;
-  itemName: string;
-  barCode: string;
-  actualQty: number;
-  price?: number;
-};
 
-type Executive = {
-  _id: string;
-  name: string;
-  surname?: string;
-  items: ExecutiveItem[];
-};
+
+
 
 type CustomerItem = {
   _id: string;
@@ -38,15 +28,7 @@ type CustomerItem = {
   price: number;
 };
 
-type Client = {
-  _id: string;
-  company: string;
-  executive?: Executive;
-  items?: CustomerItem[];
-  // ✅ VERY IMPORTANT (FIX)
-  clientTrnNumber: string;
-  customerDiscount?: string;
-};
+
 
 type ItemRow = {
   barCode: string;

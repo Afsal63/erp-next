@@ -4,33 +4,13 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import SaleOrderService from "@/services/SaleOrderService";
 import CustomersService from "@/services/CustomersService";
+import { Client } from "@/types/client";
 
 const ITEMS_PER_PAGE = 10;
 
 /* ================= TYPES (ADDED ONLY) ================= */
 
-type ExecutiveItem = {
-  _id: string;
-  itemName: string;
-  barCode: string;
-  actualQty: number;
-  price?: number;
-};
 
-type Executive = {
-  _id: string;
-  name: string;
-  surname?: string;
-  items: ExecutiveItem[]; // ✅ THIS WAS MISSING
-};
-
-type Client = {
-  _id: string;
-  company: string;
-  executive?: Executive;
-  clientTrnNumber?: string;
-  customerDiscount?: string;
-};
 
 const useSaleOrders = () => {
   /* ================= LIST ================= */
