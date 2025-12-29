@@ -45,6 +45,7 @@ type Client = {
   items?: CustomerItem[];
   // ✅ VERY IMPORTANT (FIX)
   clientTrnNumber: string;
+  customerDiscount?: string;
 };
 
 type ItemRow = {
@@ -146,19 +147,23 @@ export default function SaleOrderModal({
   const recalcTotals = (rows: ItemRow[]) => {
     const subTotal = rows.reduce((s, r) => s + r.total, 0);
 
-    // ✅ TAX RULE:
-    // If customer has NO clientTrnNumber → tax = 0
-    const hasClientTRN = Boolean(form.clientTrnNumber);
+    // ✅ CUSTOMER DISCOUNT (%)
+    const discountPct = Number(form.customerDiscount || 0);
+    const discountAmount = (subTotal * discountPct) / 100;
+    const discountedSubTotal = subTotal - discountAmount;
 
+    // ✅ TAX RULE
+    const hasClientTRN = Boolean(form.clientTrnNumber);
     const taxRate = hasClientTRN ? Number(form.taxRate || 5) : 0;
-    const taxTotal = (subTotal * taxRate) / 100;
+    const taxTotal = (discountedSubTotal * taxRate) / 100;
 
     setForm((prev: any) => ({
       ...prev,
       items: rows,
       subTotal,
+      discountAmount,
       taxTotal,
-      total: subTotal + taxTotal,
+      total: discountedSubTotal + taxTotal,
     }));
   };
 
@@ -269,6 +274,9 @@ export default function SaleOrderModal({
 
                     // ✅ VERY IMPORTANT (FIX)
                     clientTrnNumber: c.clientTrnNumber || "",
+
+                    // ✅ DISCOUNT
+                    customerDiscount: Number(c.customerDiscount || 0),
 
                     // ✅ PRICE SOURCE (SAFE)
                     customerItems: c.items || [],
@@ -391,6 +399,12 @@ export default function SaleOrderModal({
                 label="Tax (5%)"
                 value={String(form.taxTotal || "0.00")}
                 onChange={() => {}}
+                disabled
+              />
+              <FormInput
+                label={`Discount (${form.customerDiscount || 0}%)`}
+                value={String(form.discountAmount || "0.00")}
+                 onChange={() => {}}
                 disabled
               />
               <FormInput

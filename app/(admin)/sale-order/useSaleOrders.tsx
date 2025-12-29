@@ -29,6 +29,7 @@ type Client = {
   company: string;
   executive?: Executive;
   clientTrnNumber?: string;
+  customerDiscount?: string;
 };
 
 const useSaleOrders = () => {
@@ -125,6 +126,9 @@ const useSaleOrders = () => {
       client: "",
       clientName: "",
       clientTrnNumber: "",
+      customerDiscount: 0,
+      discountAmount: 0,
+      customerItems: [],
       executive: "",
       executiveName: "",
       executiveItems: [], // ✅ SAFE ADD
@@ -156,7 +160,11 @@ const useSaleOrders = () => {
         ...data,
         client: data.client?._id || "",
         clientName: data.client?.company || "",
+        // ✅ ADD THESE
         clientTrnNumber: data.client?.clientTrnNumber || "",
+        customerDiscount: Number(data.client?.customerDiscount || 0),
+        customerItems: data.client?.items || [],
+        discountAmount: data.discountAmount || 0,
         executive: data.executive?._id || "",
         executiveName: data.executive
           ? `${data.executive.name} ${data.executive.surname || ""}`
