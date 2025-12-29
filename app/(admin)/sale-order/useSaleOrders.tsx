@@ -1,5 +1,5 @@
 "use client";
-
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import SaleOrderService from "@/services/SaleOrderService";
@@ -39,6 +39,7 @@ const useSaleOrders = () => {
   const [modalForm, setModalForm] = useState<any>({});
   const [modalId, setModalId] = useState<string | null>(null);
   const [modalLoading, setModalLoading] = useState(false);
+      const router = useRouter();
 
   /* ================= FETCH ORDERS ================= */
   const fetchOrders = async (
@@ -228,6 +229,7 @@ if (res?.success) {
     orders,
     page,
     pagination,
+    router,
 
     customers,
     setCustomerSearch,

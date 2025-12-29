@@ -14,6 +14,7 @@ export default function EmployeesPage() {
     employees,
     page,
     setPage,
+    router,
 
     deleteId,
     deleteName,
@@ -41,9 +42,7 @@ export default function EmployeesPage() {
 
   if (loading) {
     return (
-      <div className="p-6 text-gray-500 text-sm">
-        Loading employees...
-      </div>
+      <div className="p-6 text-gray-500 text-sm">Loading employees...</div>
     );
   }
 
@@ -53,25 +52,29 @@ export default function EmployeesPage() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold">Employees</h1>
-          <p className="text-sm text-gray-500">
-            Manage your employee list
-          </p>
+          <p className="text-sm text-gray-500">Manage your employee list</p>
         </div>
+      </div>
 
+      {/* ================= SEARCH ================= */}
+
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <SearchInput
+          onSearch={handleSearch}
+          placeholder="Search employees..."
+        />
         <button
           onClick={openCreateModal}
-          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+          className="
+            flex items-center gap-2 px-4 py-2 rounded-lg
+            bg-blue-600 text-white
+            hover:bg-blue-700 transition
+          "
         >
           <Plus size={16} />
           Create Employee
         </button>
       </div>
-
-      {/* ================= SEARCH ================= */}
-      <SearchInput
-        onSearch={handleSearch}
-        placeholder="Search employees..."
-      />
 
       {/* ================= DESKTOP TABLE ================= */}
       <div className="hidden md:block bg-white border rounded-2xl shadow-sm overflow-visible">
@@ -115,7 +118,7 @@ export default function EmployeesPage() {
 
                 <td className="p-4 text-center">
                   <ActionDropdown
-                    onShow={() => openItemModal(e._id, "view")}
+                    onShow={() => router.push(`/employees/${e._id}`)}
                     onEdit={() => openItemModal(e._id, "edit")}
                     onDelete={() => {
                       setDeleteId(e._id);
@@ -153,7 +156,7 @@ export default function EmployeesPage() {
               </div>
 
               <ActionDropdown
-                onShow={() => openItemModal(e._id, "view")}
+                onShow={() => router.push(`/employees/${e._id}`)}
                 onEdit={() => openItemModal(e._id, "edit")}
                 onDelete={() => {
                   setDeleteId(e._id);
@@ -165,16 +168,12 @@ export default function EmployeesPage() {
             <div className="grid grid-cols-2 gap-3 text-sm">
               <div>
                 <p className="text-gray-500">Department</p>
-                <p className="font-medium">
-                  {e.department || "-"}
-                </p>
+                <p className="font-medium">{e.department || "-"}</p>
               </div>
 
               <div>
                 <p className="text-gray-500">Position</p>
-                <p className="font-medium">
-                  {e.position || "-"}
-                </p>
+                <p className="font-medium">{e.position || "-"}</p>
               </div>
 
               <div>
@@ -201,7 +200,7 @@ export default function EmployeesPage() {
       </div>
 
       {/* ================= EMPLOYEE MODAL ================= */}
-       <EmployeeModal
+      <EmployeeModal
         open={modalOpen}
         mode={modalMode === "view" ? "edit" : modalMode}
         loading={modalLoading}

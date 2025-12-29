@@ -14,6 +14,7 @@ export default function SaleOrderPage() {
     orders,
     page,
     pagination,
+    router,
     setPage,
     handleSearch,
 
@@ -97,7 +98,7 @@ export default function SaleOrderPage() {
                 <td className="p-4">{new Date(o.date).toLocaleDateString()}</td>
                 <td className="p-4 text-end">
                   <ActionDropdown
-                    onShow={() => {}}
+                onShow={() => router.push(`/sale-order/${o._id}`)}
                     onEdit={() => openItemModal(o._id, "edit")}
                     onDelete={() => {
                       setDeleteId(o._id);
@@ -146,7 +147,7 @@ export default function SaleOrderPage() {
       {/* ACTION BAR */}
       <div className="pt-3 border-t flex justify-end relative">
         <ActionDropdown
-          onShow={() => {}}
+           onShow={() => router.push(`/sale-order/${o._id}`)}
           onEdit={() => openItemModal(o._id, "edit")}
           onDelete={() => {
             setDeleteId(o._id);

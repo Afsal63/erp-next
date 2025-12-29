@@ -1,5 +1,5 @@
 "use client";
-
+import { useRouter } from "next/navigation";
 import apiRequest from "@/lib/apiRequest";
 import CustomersService from "@/services/CustomersService";
 import { Customer } from "@/types/customer";
@@ -37,6 +37,7 @@ const useCustomers = () => {
   const [modalForm, setModalForm] = useState<any>({});
   const [modalId, setModalId] = useState<string | null>(null);
   const [modalLoading, setModalLoading] = useState(false);
+    const router = useRouter();
 
   /* ================= FETCH ================= */
   const fetchCustomers = async (
@@ -267,6 +268,7 @@ const useCustomers = () => {
     customers,
     page,
     pagination,
+    router,
 
     executives,
     executiveSearch,

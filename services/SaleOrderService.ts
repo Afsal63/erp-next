@@ -21,6 +21,29 @@ const SaleOrderService = {
 
   delete: (id: string) =>
     apiRequest("DELETE", `/api/saleOrder/delete/${id}`),
+
+   /* ================= SALE ORDERS BY EMPLOYEE ================= */
+
+     saleOrdersByClient: (
+    clientId: string,
+    page = 1,
+    items = 10
+  ) => {
+    return apiRequest(
+      "POST",
+      `/api/saleOrder/filter?filter=client&equal=${clientId}&page=${page}&items=${items}`
+    );
+  },
+
+  saleOrdersByEmployee: (
+    employeeId: string,
+    page = 1,
+    items = 10
+  ) =>
+    apiRequest(
+      "POST",
+      `/api/saleOrder/filter?filter=executive&equal=${employeeId}&page=${page}&items=${items}`
+    ),
 };
 
 export default SaleOrderService;

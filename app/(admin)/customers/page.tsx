@@ -10,6 +10,7 @@ import CustomerModal from "@/components/customer/CustomerModal";
 
 export default function CustomersPage() {
   const {
+    router,
     loading,
     customers,
     page,
@@ -54,16 +55,16 @@ export default function CustomersPage() {
           <h1 className="text-2xl font-bold">Customers</h1>
           <p className="text-sm text-gray-500">Manage your customer list</p>
         </div>
-
-        
       </div>
 
       {/* ================= SEARCH ================= */}
 
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-
-      <SearchInput onSearch={handleSearch} placeholder="Search customers..." />
-      {/* CREATE CUSTOMER */}
+      <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <SearchInput
+          onSearch={handleSearch}
+          placeholder="Search customers..."
+        />
+        {/* CREATE CUSTOMER */}
         <button
           onClick={openCreateModal}
           className="
@@ -75,10 +76,10 @@ export default function CustomersPage() {
           <Plus size={16} />
           Create Customer
         </button>
-        </div>
+      </div>
 
       {/* ================= DESKTOP TABLE ================= */}
-     <div className="hidden md:block bg-white border rounded-2xl shadow-sm overflow-visible">
+      <div className="hidden md:block bg-white border rounded-2xl shadow-sm overflow-visible">
         <table className="w-full text-sm">
           <thead className="bg-gray-50">
             <tr>
@@ -133,7 +134,7 @@ export default function CustomersPage() {
                 </td>
                 <td className="p-4 text-center">
                   <ActionDropdown
-                    onShow={() => openItemModal(c._id, "view")}
+                    onShow={() => router.push(`/customers/${c._id}`)}
                     onEdit={() => openItemModal(c._id, "edit")}
                     onDelete={() => {
                       setDeleteId(c._id);
@@ -167,7 +168,7 @@ export default function CustomersPage() {
               </div>
 
               <ActionDropdown
-                onShow={() => openItemModal(c._id, "view")}
+                onShow={() => router.push(`/customers/${c._id}`)}
                 onEdit={() => openItemModal(c._id, "edit")}
                 onDelete={() => {
                   setDeleteId(c._id);
@@ -223,7 +224,6 @@ export default function CustomersPage() {
         onPageChange={setPage}
       />
 
-    
       <CustomerModal
         open={modalOpen}
         mode={modalMode}
@@ -235,7 +235,6 @@ export default function CustomersPage() {
         executives={executives}
         onExecutiveSearch={setExecutiveSearch}
       />
-    
 
       <ConfirmModal
         open={!!deleteId}

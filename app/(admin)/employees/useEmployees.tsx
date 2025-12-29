@@ -1,3 +1,4 @@
+import { useRouter } from "next/navigation";
 import apiRequest from "@/lib/apiRequest";
 import EmployeeService from "@/services/EmployeeService";
 import InventoryItemService from "@/services/InventoryItemService";
@@ -24,6 +25,7 @@ const useEmployees = () => {
   );
   const [modalForm, setModalForm] = useState<any>({});
   const [modalLoading, setModalLoading] = useState(false);
+  const router = useRouter();
 
   const fetchEmployees = async (pageNo = page, searchValue = search) => {
     try {
@@ -204,6 +206,7 @@ const useEmployees = () => {
     employees,
     page,
     pagination,
+    router,
 
     modalOpen,
     modalMode,

@@ -32,7 +32,7 @@ const POSITIONS = [
 
 type Props = {
   open: boolean;
-  mode: "create" | "edit";
+  mode?: "create" | "edit" |"";
   loading?: boolean;
   form: any;
   setForm: (fn: (prev: any) => any) => void;
