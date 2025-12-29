@@ -98,7 +98,7 @@ export default function SaleOrderPage() {
                 <td className="p-4 text-center">
                   <ActionDropdown
                     onShow={() => {}}
-                    onEdit={() => {}}
+                    onEdit={() => openItemModal(o._id, "edit")}
                     onDelete={() => {
                       setDeleteId(o._id);
                       setDeleteName(o.number);
@@ -117,17 +117,17 @@ export default function SaleOrderPage() {
         )}
       </div>
       {/* ================= SALE ORDER MODAL ================= */}
-    <SaleOrderModal
-  open={modalOpen}
-  mode={modalMode}
-  loading={modalLoading}
-  form={modalForm}
-  setForm={setModalForm}
-  onClose={() => setModalOpen(false)}
-  onSave={saveOrder}
-  customers={customers}
-  onCustomerSearch={setCustomerSearch}
-/>
+      <SaleOrderModal
+        open={modalOpen}
+        mode={modalMode}
+        loading={modalLoading}
+        form={modalForm}
+        setForm={setModalForm}
+        onClose={() => setModalOpen(false)}
+        onSave={saveOrder}
+        customers={customers}
+        onCustomerSearch={setCustomerSearch}
+      />
 
       {/* ================= DELETE CONFIRM ================= */}
 

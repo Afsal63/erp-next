@@ -17,7 +17,7 @@ const SaleOrderService = {
     apiRequest("POST", `/api/saleOrder/create`, data),
 
   update: (id: string, data: any) =>
-    apiRequest("PUT", `/api/saleOrder/update/${id}`, data),
+    apiRequest("PATCH", `/api/saleOrder/update/${id}`, data),
 
   delete: (id: string) =>
     apiRequest("DELETE", `/api/saleOrder/delete/${id}`),
