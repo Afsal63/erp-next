@@ -225,8 +225,8 @@ const useSaleOrders = () => {
 
       setModalOpen(false);
       fetchOrders();
-    } catch {
-      toast.error("Save failed");
+    } catch (error) {
+      toast.error(`Save failed ${error}`);
     } finally {
       setModalLoading(false);
     }
