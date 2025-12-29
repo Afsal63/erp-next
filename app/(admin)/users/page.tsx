@@ -5,6 +5,7 @@ import SearchInput from "@/components/ui/SearchInput";
 import Pagination from "@/components/ui/Pagination";
 import UserDropdown from "@/components/user/UserDropDown";
 import UserActionModal from "@/components/user/UserActionModal";
+import ConfirmModal from "@/components/ui/ConfirmModal";
 
 export default function UsersPage() {
   const {
@@ -21,7 +22,14 @@ export default function UsersPage() {
     setSelectedUser,
     setActionMode,
     updatePassword,
-    updateRole
+    updateRole,
+    deleteId,
+    deleteItem,
+    setDeleteId,
+    deleting,
+    deleteName,
+    setDeleteName,
+    setDeleting,
   } = useUsers();
 
   if (loading) {
@@ -107,7 +115,10 @@ export default function UsersPage() {
                       setActionMode("password");
                       setActionOpen(true);
                     }}
-                    onDelete={() => console.log("Delete user", u._id)}
+                    onDelete={() => {
+                      setDeleteId(u._id);
+                      setDeleteName(u.name);
+                    }}
                   />
                 </td>
               </tr>
@@ -136,10 +147,25 @@ export default function UsersPage() {
               </div>
 
               <UserDropdown
-                onShow={() => console.log("Show user", u._id)}
-                onUpdateRole={() => console.log("Update role", u._id)}
-                onUpdatePassword={() => console.log("Update password", u._id)}
-                onDelete={() => console.log("Delete user", u._id)}
+                onShow={() => {
+                  setSelectedUser(u);
+                  setActionMode("view");
+                  setActionOpen(true);
+                }}
+                onUpdateRole={() => {
+                  setSelectedUser(u);
+                  setActionMode("role");
+                  setActionOpen(true);
+                }}
+                onUpdatePassword={() => {
+                  setSelectedUser(u);
+                  setActionMode("password");
+                  setActionOpen(true);
+                }}
+                onDelete={() => {
+                  setDeleteId(u._id);
+                  setDeleteName(u.name);
+                }}
               />
             </div>
 
@@ -187,16 +213,39 @@ export default function UsersPage() {
           setSelectedUser(null);
         }}
         onSubmit={(data) => {
-    if (!selectedUser) return;
+          if (!selectedUser) return;
 
-    if (actionMode === "password") {
-      updatePassword(selectedUser._id, data);
-    }
+          if (actionMode === "password") {
+            updatePassword(selectedUser._id, data);
+          }
 
-    if (actionMode === "role") {
-      updateRole(selectedUser._id, data);
-    }
-  }}
+          if (actionMode === "role") {
+            updateRole(selectedUser._id, data);
+          }
+        }}
+      />
+      {/* ================= Delete ================= */}
+
+      <ConfirmModal
+        open={!!deleteId}
+        title="Delete User"
+        message={`Are you sure you want to delete "${deleteName}"?`}
+        loading={deleting}
+        onCancel={() => {
+          setDeleteId(null);
+          setDeleteName("");
+        }}
+        onConfirm={async () => {
+          if (!deleteId) return;
+          try {
+            setDeleting(true);
+            await deleteItem(deleteId);
+          } finally {
+            setDeleting(false);
+            setDeleteId(null);
+            setDeleteName("");
+          }
+        }}
       />
 
       {/* ================= PAGINATION ================= */}

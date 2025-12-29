@@ -23,6 +23,8 @@ const UsersService = {
       "GET",
       `/api/user/search?page=${page}&items=${items}&q=${q}`
     ),
+      deleteItem: (id: string) =>
+    apiRequest("DELETE", `/api/user/delete/${id}`),
 };
 
 export default UsersService;
