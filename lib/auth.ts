@@ -19,9 +19,14 @@ export const getUser = () => {
     : null;
 };
 
-export const isLoggedIn = (): boolean => {
+export const isSuperAdmin = (): boolean => {
   const auth = getAuth();
-  return Boolean(auth?.access_token);
+  return Boolean(auth?.role =="super admin");
+};
+
+export const isExecutive = (): boolean => {
+  const auth = getAuth();
+  return Boolean(auth?.role =="executive");
 };
 
 export const logout = () => {

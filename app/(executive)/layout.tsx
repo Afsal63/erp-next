@@ -2,12 +2,12 @@
 
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { isSuperAdmin } from "@/lib/auth";
+import { isExecutive } from "@/lib/auth";
 
-import Sidebar from "@/components/layout/Sidebar";
-import Topbar from "@/components/layout/Topbar";
+import Sidebar from "@/components/executiveLayout/Sidebar";
+import Topbar from "@/components/executiveLayout/Topbar";
 
-export default function AdminLayout({
+export default function ExecutiveLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -15,7 +15,7 @@ export default function AdminLayout({
   const router = useRouter();
 
   useEffect(() => {
-    if (!isSuperAdmin()) {
+    if (!isExecutive()) {
       router.replace("/login");
     }
   }, [router]);

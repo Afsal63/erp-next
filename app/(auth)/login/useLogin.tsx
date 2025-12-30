@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import AuthService from "@/services/AuthService";
-import { isLoggedIn } from "@/lib/auth";
+import { isSuperAdmin,isExecutive } from "@/lib/auth";
 
 const useLogin = () => {
   const router = useRouter();
@@ -15,8 +15,11 @@ const useLogin = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    if (isLoggedIn()) {
+    if (isSuperAdmin()) {
       router.replace("/dashboard");
+    }
+    if(isExecutive()){
+      router.replace("executive-dashboard")
     }
   }, [router]);
 
