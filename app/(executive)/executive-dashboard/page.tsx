@@ -14,7 +14,6 @@ export default function DashboardPage() {
     error,
     saleSummary,
     customerSummary,
-    inventory,
     saleOrderList
   } = useDashboard();
 
@@ -41,7 +40,7 @@ export default function DashboardPage() {
         <Card title="Total Sales - This month" value={`₹${saleSummary?.total || 0}`} />
         <Card title="New Customers" value={customerSummary?.new || 0} />
         <Card title="Active Customers" value={customerSummary?.active || 0} />
-        <Card title="Inventory Items" value={inventory.length} />
+      
       </div>
 
       {/* Charts */}
@@ -58,9 +57,9 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Inventory */}
-      <Card title="Recent Inventory">
+      {/* <Card title="Recent Inventory">
         <RecentInventory data={inventory} />
-      </Card>
+      </Card> */}
     </div>
   );
 }

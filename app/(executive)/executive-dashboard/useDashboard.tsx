@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import DashboardService from "@/services/DashboardService";
+import DashboardService from "@/services/executive/DashboardService";
+import { getUser } from "@/lib/auth";
+import { UserType } from "@/types/user";
 
 const useDashboard = () => {
   const [loading, setLoading] = useState(true);
@@ -9,35 +11,47 @@ const useDashboard = () => {
 
   const [saleSummary, setSaleSummary] = useState<any>(null);
   const [quotationSummary, setQuotationSummary] = useState<any>(null);
-  const [saleOrderList, setSalerOrderList] = useState<any>(null);
+  const [saleOrderList, setSaleOrderList] = useState<any>(null);
   const [customerSummary, setCustomerSummary] = useState<any>(null);
-  const [inventory, setInventory] = useState<any[]>([]);
+  const [user, setUser] = useState<UserType | null>(null);
 
+  /* ================= GET USER ================= */
   useEffect(() => {
+    const currentUser = getUser();
+    setUser(currentUser);
+  }, []);
+
+  /* ================= FETCH DASHBOARD ================= */
+  useEffect(() => {
+    if (!user?.id) return; // ⛔ wait until user is ready
+
     const fetchDashboard = async () => {
       try {
         setLoading(true);
+        setError("");
 
         const [
-          saleRes,
-          recentSalerOrder,
+          saleOrderRes,
+          recentSaleOrderRes,
           customerRes,
-          inventoryRes,
         ] = await Promise.all([
-          DashboardService.getSaleOrderSummary(),
-          DashboardService.getRecentSalerOrderList(),
-          DashboardService.getCustomerSummary(),
-          DashboardService.getRecentInventory(),
+          DashboardService.getSaleOrderSummary(user.id),
+          DashboardService.getRecentSaleOrderList(user.id),
+          DashboardService.getCustomerSummary(user.id),
         ]);
 
-        if (saleRes?.success) setSaleSummary(saleRes.result);
-        if (recentSalerOrder?.success)
-          setSalerOrderList(recentSalerOrder.result);
-        if (customerRes?.success)
+        if (saleOrderRes?.success) {
+          setSaleSummary(saleOrderRes.result);
+        }
+
+        if (recentSaleOrderRes?.success) {
+          setSaleOrderList(recentSaleOrderRes.result.recentOrders);
+        }
+
+        if (customerRes?.success) {
           setCustomerSummary(customerRes.result);
-        if (inventoryRes?.success)
-          setInventory(inventoryRes.result || []);
-      } catch (err: any) {
+        }
+      } catch (err) {
         setError("Failed to load dashboard data");
       } finally {
         setLoading(false);
@@ -45,7 +59,7 @@ const useDashboard = () => {
     };
 
     fetchDashboard();
-  }, []);
+  }, [user?.id]);
 
   return {
     loading,
@@ -53,8 +67,7 @@ const useDashboard = () => {
     saleSummary,
     quotationSummary,
     customerSummary,
-    inventory,
-    saleOrderList
+    saleOrderList,
   };
 };
 

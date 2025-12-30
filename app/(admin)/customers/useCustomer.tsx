@@ -1,7 +1,7 @@
 "use client";
 import { useRouter } from "next/navigation";
 import apiRequest from "@/lib/apiRequest";
-import CustomersService from "@/services/CustomersService";
+import CustomersService from "@/services/admin/CustomersService";
 import { Customer } from "@/types/customer";
 import { Executive } from "@/types/executive";
 import { useEffect, useState } from "react";

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import AuthService from "@/services/AuthService";
+import AuthService from "@/services/admin/AuthService";
 import { Boxes, FileText, LayoutDashboard, UserCog, Users,FileChartColumnIncreasing } from "lucide-react";
 import { UserType } from "@/types/user";
 

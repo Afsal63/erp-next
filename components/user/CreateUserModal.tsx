@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { X, Eye, EyeOff, Plus } from "lucide-react";
 import apiRequest from "@/lib/apiRequest";
-import EmployeeService from "@/services/EmployeeService";
+import EmployeeService from "@/services/admin/EmployeeService";
 
 /* ================= TYPES ================= */
 

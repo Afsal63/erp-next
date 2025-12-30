@@ -1,7 +1,7 @@
 import { useRouter } from "next/navigation";
 import apiRequest from "@/lib/apiRequest";
-import EmployeeService from "@/services/EmployeeService";
-import InventoryItemService from "@/services/InventoryItemService";
+import EmployeeService from "@/services/admin/EmployeeService";
+import InventoryItemService from "@/services/admin/InventoryItemService";
 import { Employee } from "@/types/employee";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";

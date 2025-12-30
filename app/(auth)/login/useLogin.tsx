@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import AuthService from "@/services/AuthService";
+import AuthService from "@/services/admin/AuthService";
 import { isSuperAdmin,isExecutive } from "@/lib/auth";
 
 const useLogin = () => {

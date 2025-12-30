@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import DashboardService from "@/services/DashboardService";
+import DashboardService from "@/services/admin/DashboardService";
 
 const useDashboard = () => {
   const [loading, setLoading] = useState(true);

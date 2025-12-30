@@ -2,8 +2,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import SaleOrderService from "@/services/SaleOrderService";
-import CustomersService from "@/services/CustomersService";
+import SaleOrderService from "@/services/admin/SaleOrderService";
+import CustomersService from "@/services/admin/CustomersService";
 import { Client } from "@/types/client";
 
 const ITEMS_PER_PAGE = 10;

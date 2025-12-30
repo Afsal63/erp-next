@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import apiRequest from "@/lib/apiRequest";
-import SaleOrderService from "@/services/SaleOrderService";
+import SaleOrderService from "@/services/admin/SaleOrderService";
 
 const ITEMS_PER_PAGE = 10;
 

@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import InventoryService from "@/services/InventoryService";
+import InventoryService from "@/services/admin/InventoryService";
 
 export type InventoryItem = {
   id: string;

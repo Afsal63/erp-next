@@ -4,7 +4,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import SalesReportService from "@/services/SalesReportService";
+import SalesReportService from "@/services/admin/SalesReportService";
 
 type SalesReportItem = {
   category: string;

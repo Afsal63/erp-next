@@ -10,6 +10,7 @@ export const getUser = () => {
   const auth = getAuth();
   return auth
     ? {
+        id: auth.id,
         name: auth.name,
         surname: auth.surname,
         email: auth.email,
@@ -21,12 +22,12 @@ export const getUser = () => {
 
 export const isSuperAdmin = (): boolean => {
   const auth = getAuth();
-  return Boolean(auth?.role =="super admin");
+  return Boolean(auth?.role == "super admin");
 };
 
 export const isExecutive = (): boolean => {
   const auth = getAuth();
-  return Boolean(auth?.role =="executive");
+  return Boolean(auth?.role == "executive");
 };
 
 export const logout = () => {

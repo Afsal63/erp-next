@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import jsPDF from "jspdf";
-import SaleOrderService from "@/services/SaleOrderService";
+import SaleOrderService from "@/services/admin/SaleOrderService";
 
 export default function useViewSaleOrder(
   printRef: React.RefObject<HTMLDivElement>

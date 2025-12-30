@@ -2,7 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, ShoppingCart, IndianRupee } from "lucide-react";
-import EmployeeService from "@/services/EmployeeService";
+import EmployeeService from "@/services/admin/EmployeeService";
 import Pagination from "@/components/ui/Pagination";
 import useEmployeeSaleOrders from "./useEmployeeSaleOrders";
 

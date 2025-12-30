@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, ShoppingCart, IndianRupee } from "lucide-react";
-import CustomerService from "@/services/CustomersService";
+import CustomerService from "@/services/admin/CustomersService";
 import Pagination from "@/components/ui/Pagination";
 import useCustomerSaleOrders from "./useCustomerSaleOrders";
 

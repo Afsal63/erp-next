@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import UsersService from "@/services/UsersService";
+import UsersService from "@/services/admin/UsersService";
 
 const ITEMS_PER_PAGE = 10;
 

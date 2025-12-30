@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import InventoryItemService from "@/services/InventoryItemService";
+import InventoryItemService from "@/services/admin/InventoryItemService";
 import { toast } from "sonner";
 
 const ITEMS_PER_PAGE = 10;
