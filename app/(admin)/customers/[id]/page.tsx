@@ -115,7 +115,7 @@ export default function CustomerViewPage() {
             <div
               key={o._id}
               onClick={() => router.push(`/sale-order/${o._id}`)}
-              className="border rounded-xl p-4 hover:shadow-sm transition space-y-2"
+              className="border rounded-xl cursor-pointer p-4 hover:shadow-sm transition space-y-2"
             >
               <div className="flex justify-between">
                 <span className="font-semibold">{o.number}</span>
