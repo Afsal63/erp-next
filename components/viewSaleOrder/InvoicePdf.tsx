@@ -21,13 +21,24 @@ const styles = StyleSheet.create({
 
   headerRow: {
     flexDirection: "row",
+    alignItems: "flex-start", // ✅ key for vertical alignment
     justifyContent: "space-between",
     marginBottom: 20,
   },
 
-  company: {
-    width: "32%",
-  },
+  /* ===== COLUMN WIDTHS (TOTAL = 100%) ===== */
+
+company: {
+  width: "32%",
+},
+
+clientBlock: {
+  width: "38%", // ⬅️ increased
+},
+
+executiveBlock: {
+  width: "30%", // ⬅️ pushed right
+},
 
   logo: {
     width: 120,
@@ -37,19 +48,7 @@ const styles = StyleSheet.create({
   companyName: {
     fontSize: 11,
     fontWeight: "bold",
-    marginBottom: 4,
-  },
-
-  arabic: {
-    fontSize: 10,
-    textAlign: "right",
-    direction: "rtl",
-    lineHeight: 1.4,
     marginBottom: 6,
-  },
-
-  block: {
-    width: "34%",
   },
 
   blockTitle: {
@@ -58,22 +57,46 @@ const styles = StyleSheet.create({
     marginBottom: 6,
   },
 
-  /* ================= FIXED ROW (IMPORTANT) ================= */
+  /* ================= ROW ALIGNMENT ================= */
 
-  rowFixed: {
+  row: {
     flexDirection: "row",
+    alignItems: "flex-start",
     marginBottom: 4,
   },
 
-  labelCol: {
-    width: 90,                 // 🔒 fixed width
+ label: {
+  width: 70, // ⬅️ reduced from 90
+  color: "#6b7280",
+},
+
+value: {
+  flex: 1,
+  fontWeight: "bold",
+  // lineHeight: 1,
+},
+
+execValue: {
+  flex: 1,
+  fontWeight: "bold",
+  // lineHeight: 1.3,
+},
+
+  /* ===== Executive slightly compact text ===== */
+
+  execRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 4,
+    fontSize: 9,
+  },
+
+  execLabel: {
+    width: 65,
     color: "#6b7280",
   },
 
-  valueCol: {
-    flex: 1,                   // 🔄 flexible
-    fontWeight: "bold",
-  },
+
 
   /* ================= DIVIDER ================= */
 
@@ -128,6 +151,33 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: "bold",
   },
+
+  /* ================= FOOTER ================= */
+
+  footer: {
+    position: "absolute",
+    bottom: 32,
+    left: 32,
+    right: 32,
+    flexDirection: "row",
+    justifyContent: "space-between",
+  },
+
+  footerBlock: {
+    width: "40%",
+  },
+
+  footerTitle: {
+    fontSize: 10,
+    fontWeight: "bold",
+    marginBottom: 30,
+  },
+
+  footerLine: {
+    borderTop: "1 solid #000",
+    paddingTop: 6,
+    fontSize: 9,
+  },
 });
 
 /* ================= PDF ================= */
@@ -140,74 +190,70 @@ export default function InvoicePdf({ order }: { order: any }) {
         {/* ================= HEADER ================= */}
         <View style={styles.headerRow}>
 
-          {/* ================= COMPANY ================= */}
+          {/* ===== COMPANY ===== */}
           <View style={styles.company}>
             <Image src="/images/logo/logo.png" style={styles.logo} />
-
             <Text style={styles.companyName}>
               MUSFIRA SALTED PRESERVED FISH & SEAFOOD TRADING CO.L.L.C
             </Text>
-
             <Image src="/images/logo/logo1.png" style={styles.logo} />
-
             <Text>+971 52 972 4362 / 058 877 3535</Text>
             <Text>Deira, Dubai - UAE</Text>
             <Text>musfiradryfishdubai@gmail.com</Text>
             <Text>TRN: 100614900700003</Text>
           </View>
 
-          {/* ================= CLIENT ================= */}
-          <View style={styles.block}>
+          {/* ===== CLIENT ===== */}
+          <View style={styles.clientBlock}>
             <Text style={styles.blockTitle}>Client</Text>
 
-            <View style={styles.rowFixed}>
-              <Text style={styles.labelCol}>Company :</Text>
-              <Text style={styles.valueCol}>{order.client?.company}</Text>
+            <View style={styles.row}>
+              <Text style={styles.label}>Company :</Text>
+              <Text style={styles.value}>{order.client?.company}</Text>
             </View>
 
-            <View style={styles.rowFixed}>
-              <Text style={styles.labelCol}>Address :</Text>
-              <Text style={styles.valueCol}>{order.client?.address}</Text>
+            <View style={styles.row}>
+              <Text style={styles.label}>Address :</Text>
+              <Text style={styles.value}>{order.client?.address}</Text>
             </View>
 
-            <View style={styles.rowFixed}>
-              <Text style={styles.labelCol}>Phone :</Text>
-              <Text style={styles.valueCol}>{order.client?.phone}</Text>
+            <View style={styles.row}>
+              <Text style={styles.label}>Phone :</Text>
+              <Text style={styles.value}>{order.client?.phone}</Text>
             </View>
 
-            <View style={styles.rowFixed}>
-              <Text style={styles.labelCol}>Client TRN :</Text>
-              <Text style={styles.valueCol}>
-                {order.client?.clientTrnNumber}
-              </Text>
+            <View style={styles.row}>
+              <Text style={styles.label}>Client TRN :</Text>
+              <Text style={styles.value}>{order.client?.clientTrnNumber}</Text>
             </View>
           </View>
 
-          {/* ================= EXECUTIVE ================= */}
-          <View style={styles.block}>
+          {/* ===== EXECUTIVE ===== */}
+          <View style={styles.executiveBlock}>
             <Text style={styles.blockTitle}>Executive</Text>
 
-            <View style={styles.rowFixed}>
-              <Text style={styles.labelCol}>Date :</Text>
-              <Text style={styles.valueCol}>
+            <View style={styles.execRow}>
+              <Text style={styles.execLabel}>Date :</Text>
+              <Text style={styles.execValue}>
                 {new Date(order.date).toDateString()}
               </Text>
             </View>
 
-            <View style={styles.rowFixed}>
-              <Text style={styles.labelCol}>Name :</Text>
-              <Text style={styles.valueCol}>
+            <View style={styles.execRow}>
+              <Text style={styles.execLabel}>Name :</Text>
+              <Text style={styles.execValue}>
                 {order.executive?.name} {order.executive?.surname}
               </Text>
             </View>
 
-            <View style={styles.rowFixed}>
-              <Text style={styles.labelCol}>Phone :</Text>
-              <Text style={styles.valueCol}>
+            <View style={styles.execRow}>
+              <Text style={styles.execLabel}>Phone :</Text>
+              <Text style={styles.execValue}>
                 {order.executive?.phonePrefix} {order.executive?.phone}
               </Text>
             </View>
           </View>
+
         </View>
 
         <View style={styles.divider} />
@@ -255,6 +301,23 @@ export default function InvoicePdf({ order }: { order: any }) {
           <View style={[styles.totalRow, styles.grandTotal]}>
             <Text>Grand Total :</Text>
             <Text>{order.total.toFixed(2)}</Text>
+          </View>
+        </View>
+
+        {/* ================= FOOTER ================= */}
+        <View style={styles.footer} fixed>
+          <View style={styles.footerBlock}>
+            <Text style={styles.footerTitle}>Delivered By</Text>
+            <View style={styles.footerLine}>
+              <Text>Name / Signature</Text>
+            </View>
+          </View>
+
+          <View style={styles.footerBlock}>
+            <Text style={styles.footerTitle}>Received By</Text>
+            <View style={styles.footerLine}>
+              <Text>Name / Signature</Text>
+            </View>
           </View>
         </View>
 
