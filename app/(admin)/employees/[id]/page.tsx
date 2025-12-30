@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, ShoppingCart, IndianRupee } from "lucide-react";
@@ -74,7 +73,10 @@ export default function EmployeeViewPage() {
 
       {/* ================= INFO CARD ================= */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <InfoCard label="Name" value={`${employee.name} ${employee.surname || ""}`} />
+        <InfoCard
+          label="Name"
+          value={`${employee.name} ${employee.surname || ""}`}
+        />
         <InfoCard label="Email" value={employee.email} />
         <InfoCard
           label="Phone"
@@ -121,7 +123,8 @@ export default function EmployeeViewPage() {
           {orders.map((o: any) => (
             <div
               key={o._id}
-              className="border rounded-xl p-4 flex flex-col gap-2 hover:shadow-sm transition"
+              onClick={() => router.push(`/sale-order/${o._id}`)}
+              className="border cursor-pointer rounded-xl p-4 flex flex-col gap-2 hover:shadow-sm transition"
             >
               <div className="flex justify-between items-center">
                 <span className="font-semibold">{o.number}</span>

@@ -79,11 +79,7 @@ export default function CustomerViewPage() {
         <InfoCard label="Phone" value={customer.phone} />
         <InfoCard label="Location" value={customer.location || "-"} />
         <InfoCard label="Payment Mode" value={customer.paymentMode || "-"} />
-        <InfoCard
-          label="Status"
-          value={customer.status}
-          badge
-        />
+        <InfoCard label="Status" value={customer.status} badge />
       </div>
 
       {/* ================= STATS ================= */}
@@ -118,6 +114,7 @@ export default function CustomerViewPage() {
           {orders.map((o: any) => (
             <div
               key={o._id}
+              onClick={() => router.push(`/sale-order/${o._id}`)}
               className="border rounded-xl p-4 hover:shadow-sm transition space-y-2"
             >
               <div className="flex justify-between">
@@ -129,9 +126,7 @@ export default function CustomerViewPage() {
 
               <p className="text-sm text-gray-600">
                 Executive:{" "}
-                <span className="font-medium">
-                  {o.executive?.name || "-"}
-                </span>
+                <span className="font-medium">{o.executive?.name || "-"}</span>
               </p>
 
               <div className="flex justify-between items-center">
