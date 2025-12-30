@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import AuthService from "@/services/AuthService";
-import { Boxes, FileText, LayoutDashboard, UserCog, Users } from "lucide-react";
+import { Boxes, FileText, LayoutDashboard, UserCog, Users,FileChartColumnIncreasing } from "lucide-react";
 import { UserType } from "@/types/user";
 
 const useLayout = () => {
@@ -28,6 +28,7 @@ const useLayout = () => {
     { name: "Inventory", path: "/inventory", icon: Boxes },
     { name: "Customers", path: "/customers", icon: Users },
     { name: "Sale Orders", path: "/sale-order", icon: FileText },
+    { name: "Sals Report", path: "/sales-report", icon: FileChartColumnIncreasing },
     { name: "Employees", path: "/employees", icon: UserCog },
     { name: "Users", path: "/users", icon: Users },
   ];

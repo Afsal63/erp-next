@@ -75,7 +75,7 @@ export default function SaleOrderPage() {
         <table className="w-full text-sm">
           <thead className="bg-gray-50">
             <tr>
-              <th className="p-4 text-left">Order No</th>
+              <th className="p-4 text-left">Invoice No</th>
               <th className="p-4 text-left">Client</th>
               <th className="p-4 text-left">Executive</th>
               <th className="p-4 text-left">Date</th>
