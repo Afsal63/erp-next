@@ -2,6 +2,8 @@
 
 import { useParams, useRouter } from "next/navigation";
 import useCategorySales from "./useCategorySale";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import SalesByCategoryReportPdf from "@/components/salesReport/SalesByCategoryReportPdf";
 
 export default function SalesByCategoryPage() {
   const { category } = useParams();
@@ -51,8 +53,10 @@ export default function SalesByCategoryPage() {
   return (
     <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
       {/* ================= HEADER ================= */}
-      <div className="flex flex-wrap items-center gap-4 justify-between">
-        <div className="flex items-center gap-3">
+      {/* ================= HEADER ================= */}
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+        {/* ===== Left: Back + Title ===== */}
+        <div className="flex flex-wrap items-center gap-3">
           <button
             onClick={() => router.back()}
             className="px-3 py-1.5 border rounded-lg text-sm hover:bg-gray-100"
@@ -60,13 +64,13 @@ export default function SalesByCategoryPage() {
             ← Back
           </button>
 
-          <h1 className="text-2xl font-semibold capitalize">
+          <h1 className="text-xl lg:text-2xl font-semibold capitalize">
             {String(category).replace(/-/g, " ")} Orders
           </h1>
         </div>
 
-        {/* ================= DATE FILTER ================= */}
-        <div className="flex items-center gap-2">
+        {/* ===== Right: Filters + Download ===== */}
+        <div className="flex flex-wrap items-center gap-2">
           <input
             type="date"
             value={fromDate ?? ""}
@@ -74,7 +78,7 @@ export default function SalesByCategoryPage() {
             className="border rounded-lg px-3 py-1.5 text-sm"
           />
 
-          <span className="text-gray-400">→</span>
+          <span className="text-gray-400 hidden sm:inline">→</span>
 
           <input
             type="date"
@@ -87,10 +91,10 @@ export default function SalesByCategoryPage() {
             onClick={handleApplyFilter}
             disabled={!fromDate || !toDate}
             className="
-              px-3 py-1.5 text-sm rounded-lg
-              bg-indigo-600 text-white
-              disabled:opacity-40 disabled:cursor-not-allowed
-            "
+        px-3 py-1.5 text-sm rounded-lg
+        bg-indigo-600 text-white
+        disabled:opacity-40 disabled:cursor-not-allowed
+      "
           >
             Apply
           </button>
@@ -103,6 +107,33 @@ export default function SalesByCategoryPage() {
               Clear
             </button>
           )}
+
+          {/* ===== Download Button ===== */}
+          <PDFDownloadLink
+            document={
+              <SalesByCategoryReportPdf
+                category={String(category)}
+                data={data}
+                fromDate={fromDate}
+                toDate={toDate}
+              />
+            }
+            fileName={`${category}-sales-report.pdf`}
+          >
+            {({ loading }) => (
+              <button
+                className="
+            px-3 py-1.5 text-sm rounded-lg
+            border border-indigo-600 text-indigo-600
+            hover:bg-indigo-50
+            disabled:opacity-40
+          "
+                disabled={loading || !data.length}
+              >
+                {loading ? "Preparing PDF..." : "Download Report"}
+              </button>
+            )}
+          </PDFDownloadLink>
         </div>
       </div>
 
