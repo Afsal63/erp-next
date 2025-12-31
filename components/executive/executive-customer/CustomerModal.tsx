@@ -216,33 +216,17 @@ export default function CustomerModal({
             />
           </div>
 
-          {/* ================= EXECUTIVE ================= */}
+          {/* ================= EXECUTIVE (READ ONLY) ================= */}
           <div>
             <label className="text-xs font-medium text-gray-600">
               Executive
             </label>
+
             <input
-              placeholder="Search executive..."
-              onChange={(e) => onExecutiveSearch(e.target.value)}
-              className="w-full mt-1 px-3 py-2 border rounded-lg text-sm"
+              value={form.executiveName || ""}
+              disabled
+              className="w-full mt-1 px-3 py-2 border rounded-lg text-sm bg-gray-100 cursor-not-allowed"
             />
-            <select
-              value={form.executive || ""}
-              onChange={(e) => update("executive", e.target.value)}
-              className="w-full mt-2 px-3 py-2 border rounded-lg text-sm"
-            >
-              <option value="">Select Executive</option>
-              {form.executive &&
-                form.executiveName &&
-                !safeExecutives.some((e) => e._id === form.executive) && (
-                  <option value={form.executive}>{form.executiveName}</option>
-                )}
-              {safeExecutives.map((e) => (
-                <option key={e._id} value={e._id}>
-                  {e.name} {e.surname || ""}
-                </option>
-              ))}
-            </select>
           </div>
 
           {/* ================= BARCODE ================= */}

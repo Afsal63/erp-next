@@ -10,8 +10,6 @@ const ITEMS_PER_PAGE = 10;
 
 /* ================= TYPES (ADDED ONLY) ================= */
 
-
-
 const useSaleOrders = () => {
   /* ================= LIST ================= */
   const [orders, setOrders] = useState<any[]>([]);
@@ -39,7 +37,7 @@ const useSaleOrders = () => {
   const [modalForm, setModalForm] = useState<any>({});
   const [modalId, setModalId] = useState<string | null>(null);
   const [modalLoading, setModalLoading] = useState(false);
-      const router = useRouter();
+  const router = useRouter();
 
   /* ================= FETCH ORDERS ================= */
   const fetchOrders = async (
@@ -57,13 +55,13 @@ const useSaleOrders = () => {
           )
         : await SaleOrderService.list(pageNo, ITEMS_PER_PAGE);
 
-if (res?.success) {
-  setOrders(res.result || []);
-  setPagination(res.pagination || null);
-} else {
-  setOrders([]);
-  setPagination(null);
-}
+      if (res?.success) {
+        setOrders(res.result || []);
+        setPagination(res.pagination || null);
+      } else {
+        setOrders([]);
+        setPagination(null);
+      }
     } catch {
       toast.error("Failed to load sale orders");
     } finally {
@@ -121,7 +119,7 @@ if (res?.success) {
       date: new Date().toISOString().slice(0, 10),
       note: "",
       status: "pending",
-      taxRate: 5,
+      taxRate: 0,
       discount: 0,
       subTotal: 0,
       taxTotal: 0,
@@ -183,8 +181,14 @@ if (res?.success) {
         return;
       }
 
+      const hasClientTRN = Boolean(modalForm.clientTrnNumber);
+
       const payload = {
         ...modalForm,
+        // 🔴 CHANGE START
+        taxRate: hasClientTRN ? 5 : 0,
+        taxTotal: hasClientTRN ? Number(modalForm.taxTotal || 0) : 0,
+
         items: (modalForm.items || [])
           .filter((i: any) => Number(i.quantity) > 0) // ✅ ONLY QTY > 0
           .map((i: any) => ({

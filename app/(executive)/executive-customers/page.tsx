@@ -5,7 +5,7 @@ import useCustomers from "./useCustomer";
 import ActionDropdown from "@/components/ui/ActionDropdown";
 import Pagination from "@/components/ui/Pagination";
 import SearchInput from "@/components/ui/SearchInput";
-import { Search, Plus } from "lucide-react";
+import {  Plus } from "lucide-react";
 import CustomerModal from "@/components/executive/executive-customer/CustomerModal";
 
 export default function CustomersPage() {

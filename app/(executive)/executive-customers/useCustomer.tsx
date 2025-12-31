@@ -6,6 +6,8 @@ import { Customer } from "@/types/customer";
 import { Executive } from "@/types/executive";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { getUser } from "@/lib/auth";
+import { UserType } from "@/types/user";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -13,6 +15,7 @@ const useCustomers = () => {
   /* ================= STATE ================= */
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [loading, setLoading] = useState(false);
+  const [user, setUser] = useState<UserType | null>(null);
 
   const [page, setPage] = useState(1);
   const [pagination, setPagination] = useState<any>(null);
@@ -37,7 +40,12 @@ const useCustomers = () => {
   const [modalForm, setModalForm] = useState<any>({});
   const [modalId, setModalId] = useState<string | null>(null);
   const [modalLoading, setModalLoading] = useState(false);
-    const router = useRouter();
+  const router = useRouter();
+  /* ================= FETCH USER ================= */
+  useEffect(() => {
+    const currentUser = getUser();
+    setUser(currentUser);
+  }, []);
 
   /* ================= FETCH ================= */
   const fetchCustomers = async (
@@ -79,7 +87,6 @@ const useCustomers = () => {
   /* ================= PAGINATION ================= */
   useEffect(() => {
     fetchCustomers(page, search);
-
   }, [page]);
 
   /* ================= SEARCH ================= */
@@ -181,7 +188,8 @@ const useCustomers = () => {
       registrationType: "",
       state: "",
       country: "UAE",
-      executive: "",
+      executive: user?.id || "",
+      executiveName: user ? `${user.name} ${user.surname || ""}` : "",
       items: [],
     });
     setModalOpen(true);
@@ -201,7 +209,7 @@ const useCustomers = () => {
         paymentMode: modalForm.paymentMode,
         companyTrnNumber: modalForm.companyTrnNumber,
         clientTrnNumber: modalForm.clientTrnNumber,
-        customerDiscount:modalForm.customerDiscount,
+        customerDiscount: modalForm.customerDiscount,
         state: modalForm.state,
         country: "UAE",
 
