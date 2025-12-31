@@ -28,17 +28,17 @@ const styles = StyleSheet.create({
 
   /* ===== COLUMN WIDTHS (TOTAL = 100%) ===== */
 
-company: {
-  width: "32%",
-},
+  company: {
+    width: "32%",
+  },
 
-clientBlock: {
-  width: "38%", // ⬅️ increased
-},
+  clientBlock: {
+    width: "38%", // ⬅️ increased
+  },
 
-executiveBlock: {
-  width: "30%", // ⬅️ pushed right
-},
+  executiveBlock: {
+    width: "30%", // ⬅️ pushed right
+  },
 
   logo: {
     width: 120,
@@ -65,22 +65,36 @@ executiveBlock: {
     marginBottom: 4,
   },
 
- label: {
-  width: 70, // ⬅️ reduced from 90
-  color: "#6b7280",
-},
+  label: {
+    width: 70, // ⬅️ reduced from 90
+    color: "#6b7280",
+  },
 
-value: {
-  flex: 1,
-  fontWeight: "bold",
-  // lineHeight: 1,
-},
+  value: {
+    flex: 1,
+    fontWeight: "bold",
+    // lineHeight: 1,
+  },
 
-execValue: {
-  flex: 1,
-  fontWeight: "bold",
-  // lineHeight: 1.3,
-},
+  execValue: {
+    flex: 1,
+    fontWeight: "bold",
+    // lineHeight: 1.3,
+  },
+
+  /* 🔴 CHANGE START — INVOICE BLOCK */
+  invoiceBlock: {
+    marginBottom: 8,
+    paddingBottom: 6,
+    borderBottom: "0.5 solid #000",
+  },
+
+  invoiceNumber: {
+    fontSize: 12,
+    fontWeight: "bold",
+    marginBottom: 4,
+  },
+  /* 🔴 CHANGE END */
 
   /* ===== Executive slightly compact text ===== */
 
@@ -95,8 +109,6 @@ execValue: {
     width: 65,
     color: "#6b7280",
   },
-
-
 
   /* ================= DIVIDER ================= */
 
@@ -186,10 +198,8 @@ export default function InvoicePdf({ order }: { order: any }) {
   return (
     <Document>
       <Page size="A4" style={styles.page}>
-
         {/* ================= HEADER ================= */}
         <View style={styles.headerRow}>
-
           {/* ===== COMPANY ===== */}
           <View style={styles.company}>
             <Image src="/images/logo/logo.png" style={styles.logo} />
@@ -228,8 +238,17 @@ export default function InvoicePdf({ order }: { order: any }) {
             </View>
           </View>
 
+          {/* ===== Invoice block ===== */}
+
           {/* ===== EXECUTIVE ===== */}
           <View style={styles.executiveBlock}>
+            {/* 🔴 CHANGE START */}
+            <View style={styles.invoiceBlock}>
+              <Text style={styles.invoiceNumber}>
+                INVOICE : {order.number || "—"}
+              </Text>
+            </View>
+            {/* 🔴 CHANGE END */}
             <Text style={styles.blockTitle}>Executive</Text>
 
             <View style={styles.execRow}>
@@ -253,7 +272,6 @@ export default function InvoicePdf({ order }: { order: any }) {
               </Text>
             </View>
           </View>
-
         </View>
 
         <View style={styles.divider} />
@@ -320,7 +338,6 @@ export default function InvoicePdf({ order }: { order: any }) {
             </View>
           </View>
         </View>
-
       </Page>
     </Document>
   );
