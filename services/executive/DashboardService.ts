@@ -13,10 +13,10 @@ const DashboardService = {
       `/api/executive/recent-orders${id ? `?Id=${id}` : ""}`
     ),
 
-  getCustomerSummary: (id?: string) =>
+  getOrderSummary: (id?: string) =>
     apiRequest(
       "GET",
-      `/api/customer/summary${id ? `?id=${id}` : ""}`
+      `/api/executive/total-orders/details${id ? `?Id=${id}` : ""}`
     ),
 
   getRecentInventory: (id?: string) =>

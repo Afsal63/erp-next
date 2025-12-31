@@ -6,7 +6,7 @@ import { ArrowLeft, Search, Plus, Check } from "lucide-react";
 
 import Pagination from "@/components/ui/Pagination";
 import ActionDropdown from "@/components/ui/ActionDropdown";
-import InventoryItemModal from "@/components/inventory/InventoryItemModal";
+import InventoryItemModal from "@/components/admin/inventory/InventoryItemModal";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import SearchInput from "@/components/ui/SearchInput";
 

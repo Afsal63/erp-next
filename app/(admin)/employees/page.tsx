@@ -6,7 +6,7 @@ import SearchInput from "@/components/ui/SearchInput";
 import { Plus } from "lucide-react";
 import useEmployees from "./useEmployees";
 import ConfirmModal from "@/components/ui/ConfirmModal";
-import EmployeeModal from "@/components/employee/EmployeeModal";
+import EmployeeModal from "@/components/admin/employee/EmployeeModal";
 
 export default function EmployeesPage() {
   const {

@@ -12,7 +12,7 @@ const useDashboard = () => {
   const [saleSummary, setSaleSummary] = useState<any>(null);
   const [quotationSummary, setQuotationSummary] = useState<any>(null);
   const [saleOrderList, setSaleOrderList] = useState<any>(null);
-  const [customerSummary, setCustomerSummary] = useState<any>(null);
+  const [totalOrderSummery, setTotalOrderSummery] = useState<any>(null);
   const [user, setUser] = useState<UserType | null>(null);
 
   /* ================= GET USER ================= */
@@ -37,7 +37,7 @@ const useDashboard = () => {
         ] = await Promise.all([
           DashboardService.getSaleOrderSummary(user.id),
           DashboardService.getRecentSaleOrderList(user.id),
-          DashboardService.getCustomerSummary(user.id),
+          DashboardService.getOrderSummary(user.id),
         ]);
 
         if (saleOrderRes?.success) {
@@ -49,7 +49,7 @@ const useDashboard = () => {
         }
 
         if (customerRes?.success) {
-          setCustomerSummary(customerRes.result);
+          setTotalOrderSummery(customerRes.result);
         }
       } catch (err) {
         setError("Failed to load dashboard data");
@@ -66,7 +66,7 @@ const useDashboard = () => {
     error,
     saleSummary,
     quotationSummary,
-    customerSummary,
+    totalOrderSummery,
     saleOrderList,
   };
 };

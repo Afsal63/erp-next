@@ -1,9 +1,9 @@
 "use client";
 
 import Card from "@/components/ui/Card";
-import SaleOrderPercentageBar from "@/components/dashboard/SaleOrderPercentageBar";
-import RecentInventory from "@/components/dashboard/RecentInventory";
-import RecentSaleOrder from '@/components/dashboard/RecentSaleOrder'
+import SaleOrderPercentageBar from "@/components/admin/dashboard/SaleOrderPercentageBar";
+import RecentInventory from "@/components/admin/dashboard/RecentInventory";
+import RecentSaleOrder from '@/components/admin/dashboard/RecentSaleOrder'
 import useDashboard from "./useDashboard";
 
 import { SaleOrderPerformance } from "@/types/dashboard";

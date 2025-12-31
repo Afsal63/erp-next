@@ -4,8 +4,8 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { isExecutive } from "@/lib/auth";
 
-import Sidebar from "@/components/executiveLayout/Sidebar";
-import Topbar from "@/components/executiveLayout/Topbar";
+import Sidebar from "@/components/executive/executiveLayout/Sidebar";
+import Topbar from "@/components/executive/executiveLayout/Topbar";
 
 export default function ExecutiveLayout({
   children,

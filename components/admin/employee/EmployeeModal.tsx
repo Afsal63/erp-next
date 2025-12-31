@@ -2,8 +2,8 @@
 
 import { useState, useMemo } from "react";
 import { X } from "lucide-react";
-import FormInput from "../ui/FormInput";
-import FormSelect from "../ui/FormSelect";
+import FormInput from "@/components/ui/FormInput";
+import FormSelect from "@/components/ui/FormSelect";
 import { BARCODE_OPTIONS } from "@/constants/barcodes";
 
 /* ================= CONSTANTS ================= */

@@ -5,7 +5,7 @@ import Pagination from "@/components/ui/Pagination";
 import SearchInput from "@/components/ui/SearchInput";
 import ActionDropdown from "@/components/ui/ActionDropdown";
 import ConfirmModal from "@/components/ui/ConfirmModal";
-import SaleOrderModal from "@/components/saleOrder/SaleOrderModal";
+import SaleOrderModal from "@/components/admin/saleOrder/SaleOrderModal";
 import { Plus } from "lucide-react";
 
 export default function SaleOrderPage() {

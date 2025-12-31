@@ -4,8 +4,8 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { isSuperAdmin } from "@/lib/auth";
 
-import Sidebar from "@/components/layout/Sidebar";
-import Topbar from "@/components/layout/Topbar";
+import Sidebar from "@/components/admin/layout/Sidebar";
+import Topbar from "@/components/admin/layout/Topbar";
 
 export default function AdminLayout({
   children,

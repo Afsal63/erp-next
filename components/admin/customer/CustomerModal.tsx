@@ -1,8 +1,8 @@
 "use client";
 
 import { X, Plus, Trash2 } from "lucide-react";
-import FormSelect from "../ui/FormSelect";
-import FormInput from "../ui/FormInput";
+import FormSelect from "@/components/ui/FormSelect";
+import FormInput from "@/components/ui/FormInput";
 import { BARCODE_OPTIONS } from "@/constants/barcodes";
 
 /* ================= TYPES ================= */

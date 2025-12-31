@@ -3,7 +3,7 @@
 import { useParams, useRouter } from "next/navigation";
 import useCategorySales from "./useCategorySale";
 import { PDFDownloadLink } from "@react-pdf/renderer";
-import SalesByCategoryReportPdf from "@/components/salesReport/SalesByCategoryReportPdf";
+import SalesByCategoryReportPdf from "@/components/admin/salesReport/SalesByCategoryReportPdf";
 
 export default function SalesByCategoryPage() {
   const { category } = useParams();
