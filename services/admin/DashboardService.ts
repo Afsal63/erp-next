@@ -4,6 +4,9 @@ const DashboardService = {
   getSaleOrderSummary: () =>
     apiRequest("GET", "/api/saleOrder/summary"),
 
+  getTotalSaleOrderSummary: () =>
+    apiRequest("GET", "/api/saleOrder/total-summary"),
+
   getRecentSalerOrderList: () =>
     apiRequest("GET", "/api/recentSaleOrder/list"),
 
