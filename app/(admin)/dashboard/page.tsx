@@ -41,6 +41,8 @@ export default function DashboardPage() {
       amount: Number(item.total_amount),
     })) || [];
 
+    console.log(performance, saleSummary)
+
   return (
     <div className="space-y-10 px-4 sm:px-6 pb-10 bg-gray-50 min-h-screen">
       {/* ================= HEADER ================= */}

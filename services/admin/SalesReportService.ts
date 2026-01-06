@@ -1,10 +1,14 @@
 import apiRequest from "@/lib/apiRequest";
 
 const SalesReportService = {
-  getSalesReport: () => apiRequest("GET", `/api/sales/list`),
+  /* ================= MONTHLY / CATEGORY ================= */
+
+  getSalesReport: () =>
+    apiRequest("GET", `/api/sales/list`),
 
   getSalesByCategory: (category: string) =>
     apiRequest("GET", `/api/sales/read/?category=${category}`),
+
   filterSalesByDate: ({
     category,
     fromDate,
@@ -21,6 +25,23 @@ const SalesReportService = {
     apiRequest(
       "POST",
       `/api/sales/filter?page=${page}&items=${items}&fromDate=${fromDate}&toDate=${toDate}&category=${category}`
+    ),
+
+  /* ================= DAILY SALES ================= */
+
+  getDailySalesReport: () =>
+    apiRequest("GET", `/api/saleOrder/daily-summary`),
+
+  filterDailySalesByDate: ({
+    fromDate,
+    toDate,
+  }: {
+    fromDate: string;
+    toDate: string;
+  }) =>
+    apiRequest(
+      "GET",
+      `/api/saleOrder/daily-summary?fromDate=${fromDate}&toDate=${toDate}`
     ),
 };
 

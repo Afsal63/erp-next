@@ -24,13 +24,33 @@ export default function SalesReportPage() {
   return (
     <div className="p-6 space-y-8 bg-gray-50 min-h-screen">
       {/* ================= HEADER ================= */}
-      <div className="flex flex-col gap-1">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-          📊 Sales Report
-        </h1>
-        <p className="text-sm text-gray-500">
-          Monthly sales by customer category
-        </p>
+      {/* ================= HEADER ================= */}
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+            📊 Sales Report
+          </h1>
+          <p className="text-sm text-gray-500">
+            Monthly sales by customer category
+          </p>
+        </div>
+
+        {/* 👉 REDIRECTION BUTTON */}
+        <button
+          onClick={() => router.push("sales-report/daily-sales-report")}
+          className="
+      inline-flex items-center gap-2
+      px-4 py-2
+      text-sm font-medium
+      rounded-xl
+      bg-indigo-600 text-white
+      hover:bg-indigo-700
+      transition
+      shadow-sm
+    "
+        >
+          📅 Daily Sales
+        </button>
       </div>
 
       {/* ================= SUMMARY CARDS ================= */}
