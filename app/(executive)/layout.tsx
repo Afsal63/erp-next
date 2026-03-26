@@ -1,27 +1,16 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { isExecutive } from "@/lib/auth";
-
 import Sidebar from "@/components/executive/executiveLayout/Sidebar";
 import Topbar from "@/components/executive/executiveLayout/Topbar";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export default function ExecutiveLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isExecutive()) {
-      router.replace("/login");
-    }
-  }, [router]);
-
   return (
-    <>
+    <ProtectedRoute allowedRoles={["executive"]}>
       {/* Fixed Sidebar (Desktop only) */}
       <Sidebar />
 
@@ -35,6 +24,6 @@ export default function ExecutiveLayout({
           {children}
         </main>
       </div>
-    </>
+    </ProtectedRoute>
   );
 }

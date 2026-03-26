@@ -27,9 +27,16 @@ const AuthService = {
     return response;
   },
 
-  logout: () => {
-    localStorage.removeItem(LOCAL_STORAGE_AUTH);
-    window.location.href = "/login";
+  logout: async () => {
+    if (typeof window === "undefined") return;
+    try {
+      await apiRequest("POST", "/api/logout");
+    } catch (error) {
+      console.error("Logout failed on backend:", error);
+    } finally {
+      localStorage.removeItem(LOCAL_STORAGE_AUTH);
+      window.location.href = "/login";
+    }
   },
 
   getAuth: () => {

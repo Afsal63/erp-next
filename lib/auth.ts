@@ -1,3 +1,4 @@
+import axios from "axios";
 const AUTH_KEY = "auth";
 
 export const getAuth = () => {
@@ -30,8 +31,18 @@ export const isExecutive = (): boolean => {
   return Boolean(auth?.role == "executive");
 };
 
-export const logout = () => {
+export const logout = async () => {
   if (typeof window === "undefined") return;
-  localStorage.removeItem(AUTH_KEY);
-  window.location.href = "/login";
+  try {
+    await axios.post(
+      `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/logout`,
+      {},
+      { withCredentials: true }
+    );
+  } catch (error) {
+    console.error("Logout failed on backend:", error);
+  } finally {
+    localStorage.removeItem(AUTH_KEY);
+    window.location.href = "/login";
+  }
 };

@@ -1,27 +1,16 @@
 "use client";
 
-import { useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { isSuperAdmin } from "@/lib/auth";
-
 import Sidebar from "@/components/admin/layout/Sidebar";
 import Topbar from "@/components/admin/layout/Topbar";
+import ProtectedRoute from "@/components/auth/ProtectedRoute";
 
 export default function AdminLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!isSuperAdmin()) {
-      router.replace("/login");
-    }
-  }, [router]);
-
   return (
-    <>
+    <ProtectedRoute allowedRoles={["super admin"]}>
       {/* Fixed Sidebar (Desktop only) */}
       <Sidebar />
 
@@ -35,6 +24,6 @@ export default function AdminLayout({
           {children}
         </main>
       </div>
-    </>
+    </ProtectedRoute>
   );
 }
