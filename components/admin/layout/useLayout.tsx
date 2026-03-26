@@ -33,9 +33,9 @@ const useLayout = () => {
     { name: "Users", path: "/users", icon: Users },
   ];
 
-  const handleLogout = async () => {
+  const handleLogout = () => {
     setProfileOpen(false);
-    await AuthService.logout();
+    AuthService.logout();
   };
 
   return {
